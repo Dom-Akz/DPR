@@ -14,11 +14,10 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv_path = BASE_DIR / ".env"
 load_dotenv(dotenv_path)
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -30,7 +29,7 @@ SECRET_KEY = "django-insecure-u3^wj1-k)mg)tt2j39fmis6##-e8=(xeec*hf@-3#&$oiwfs6o
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = "dashboard.Administrateur"
 
 # Application definition
 
@@ -76,12 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "DPR.wsgi.application"
 
-DATABASE = {
+DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("DB_NAME"),
         "USER": os.environ.get("DB_USER"),
-        "PASSWORD": "",
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
         "HOST": os.environ.get("DB_HOST"),  # or your DB host
         "PORT": os.environ.get("DB_PORT"),  # default PostgreSQL port
     }
