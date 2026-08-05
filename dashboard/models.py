@@ -47,8 +47,6 @@ class Administrateur(AbstractUser):
 
 
 class Solution(models.Model):
-    """Solution / brique technique étudiée (Firewall, EDR, WAF, PAM, ...)."""
-
     name = models.CharField("Solution", max_length=100, unique=True)
 
     class Meta:
