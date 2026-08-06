@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "dashboard",
+    "django_smart_ratelimit",
 ]
 
 MIDDLEWARE = [
@@ -85,6 +86,8 @@ DATABASES = {
         "PORT": os.environ.get("DB_PORT"),
     }
 }
+
+RATELIMIT_BACKEND = "database"
 
 
 # Password validation

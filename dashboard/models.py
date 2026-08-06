@@ -77,6 +77,18 @@ class Indicator(models.Model):
         ("DUR", "Durée"),
     ]
 
+    risk_threshold = models.DecimalField(
+        "Seuil de risque",
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        default=50.00,
+    )
+
+    target_value = models.DecimalField(
+        "Valeur cible", max_digits=10, decimal_places=2, null=True, blank=True
+    )
     name = models.CharField("Indicateur", max_length=255)
     level = models.CharField(
         "Niveau", max_length=2, choices=LEVEL_CHOICES, db_index=True
@@ -135,6 +147,116 @@ class Indicator(models.Model):
             return "yellow"
         else:
             return "green"
+
+    @property
+    def current_value(self):
+        """Alias for latest_value for better readability"""
+        return self.latest_value
+
+    @property
+    def target_diff(self):
+        """Calculate difference from target"""
+        if self.current_value is not None and self.target_value is not None:
+            return self.current_value - self.target_value
+        return None
+
+    @property
+    def target_diff_percentage(self):
+        """Calculate percentage difference from target"""
+        if (
+            self.current_value is not None
+            and self.target_value
+            and self.target_value != 0
+        ):
+            return (
+                (self.current_value - self.target_value) / abs(self.target_value)
+            ) * 100
+        return None
+
+    @property
+    def performance_status(self):
+        """Get performance status based on target achievement"""
+        diff = self.target_diff_percentage
+
+        if diff is None:
+            return "unknown"
+
+        if diff >= 0:
+            return "above_target"
+        elif diff >= -10:
+            return "near_target"
+        elif diff >= -25:
+            return "below_target"
+        else:
+            return "far_below_target"
+
+    @property
+    def performance_color(self):
+        """Get color for performance status"""
+        colors = {
+            "above_target": "#3dd68c",  # green
+            "near_target": "#ffd000",  # yellow
+            "below_target": "#ff9500",  # orange
+            "far_below_target": "#ff4757",  # red
+            "unknown": "#6c757d",  # gray
+        }
+        return colors.get(self.performance_status, "#6c757d")
+
+    @property
+    def performance_label(self):
+        """Get human-readable performance label"""
+        labels = {
+            "above_target": "✓ On Target",
+            "near_target": "⚠ Near Target",
+            "below_target": "▼ Below Target",
+            "far_below_target": "✗ Far Below",
+            "unknown": "— No Target",
+        }
+        return labels.get(self.performance_status, "Unknown")
+
+    @property
+    def risk_percentage(self):
+        """Calculate risk percentage (0-100)"""
+        if not self.current_value or not self.risk_threshold:
+            return 0
+        percentage = (self.current_value / self.risk_threshold) * 100
+        return min(percentage, 100)
+
+    @property
+    def risk_color(self):
+        """Get color based on risk level"""
+        percentage = self.risk_percentage
+
+        if percentage >= 100:
+            return "#ff4757"  # red - critical
+        elif percentage >= 70:
+            return "#ffd000"  # yellow - warning
+        else:
+            return "#3dd68c"  # green - normal
+
+    @property
+    def risk_class(self):
+        """Get CSS class based on risk level"""
+        percentage = self.risk_percentage
+
+        if percentage >= 100:
+            return "risk-critical"
+        elif percentage >= 70:
+            return "risk-warning"
+        else:
+            return "risk-normal"
+
+    @property
+    def risk_label(self):
+        """Get human-readable risk label"""
+        percentage = self.risk_percentage
+
+        if percentage >= 100:
+            return "CRITICAL"
+        elif percentage >= 70:
+            return "WARNING"
+        else:
+            return "NORMAL"
 
 
 class IndicatorMeasurement(models.Model):

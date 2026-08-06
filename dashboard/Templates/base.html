@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -134,11 +135,8 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--accent-cyan),
-          var(--accent-purple)
-        );
+        background-color: var(--accent-cyan);
+        color: var(--bg-primary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -213,7 +211,6 @@
 
       .btn-primary:hover {
         background-color: #00b8d4;
-        transform: translateY(-2px);
       }
 
       .btn-secondary {
@@ -235,7 +232,6 @@
 
       .btn-danger:hover {
         background-color: #ff3838;
-        transform: translateY(-2px);
       }
 
       .content {
@@ -288,8 +284,6 @@
 
       .indicator-card:hover {
         border-color: var(--accent-cyan);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0, 217, 255, 0.1);
       }
 
       .indicator-header {

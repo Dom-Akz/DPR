@@ -7,6 +7,7 @@ from django.db.models import Q
 from functools import wraps
 from .models import Administrateur, Indicator, IndicatorMeasurement, Solution
 from django.contrib import messages
+from django_smart_ratelimit import ratelimit
 
 
 # Authentification :
@@ -16,6 +17,7 @@ def login_view(request):
     return render(request, "login.html")
 
 
+@ratelimit(key="ip", rate="5/m", block=True)
 def login_u(request):
     if request.user.is_authenticated:
         return redirect("/admin/dashboard/")

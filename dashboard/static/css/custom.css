@@ -1,4 +1,6 @@
-/* Custom Animations */
+/* Professional Dashboard Styling - No AI-Generated Look */
+
+/* Remove all decorative animations */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -19,18 +21,10 @@
   }
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
+/* Removed: pulse, shimmer - Too AI-generated */
 
 .sidebar {
-  animation: slideIn 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .indicator-card {
@@ -41,59 +35,36 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Loading State */
+/* Loading State - Minimal and professional */
 .loading {
-  animation: pulse 1.5s ease-in-out infinite;
+  opacity: 0.6;
 }
 
-/* Hover Effects */
+/* Hover Effects - No excessive transforms */
 .indicator-card:hover {
   animation: none;
 }
 
-/* Progress Bar */
+/* Professional Progress Bar - No shimmer animation */
 .progress-bar {
-  height: 8px;
+  height: 6px;
   background-color: #242c3c;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00d9ff, #9d4edd);
-  border-radius: 4px;
+  background-color: #00d9ff;
+  border-radius: 3px;
   transition: width 0.3s ease;
   position: relative;
 }
 
-.progress-bar-fill::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  animation: shimmer 2s infinite;
-}
+/* Removed: shimmer animation with ::after pseudo-element */
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Tooltip */
+/* Professional Tooltip */
 .tooltip {
   position: relative;
   display: inline-block;
@@ -113,7 +84,7 @@
   left: 50%;
   margin-left: -60px;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
   font-size: 0.75rem;
   white-space: nowrap;
 }
@@ -123,7 +94,7 @@
   opacity: 1;
 }
 
-/* Scrollbar */
+/* Professional Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -183,7 +154,7 @@
   }
 }
 
-/* Accessibility */
+/* Accessibility - Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
@@ -191,7 +162,7 @@
   }
 }
 
-/* Dark mode override (in case browser forces light mode) */
+/* Dark mode override */
 @media (prefers-color-scheme: light) {
   body {
     background-color: #0f1419;
@@ -199,7 +170,7 @@
   }
 }
 
-/* Focus states for keyboard navigation */
+/* Professional Focus states for keyboard navigation */
 button:focus,
 a:focus,
 input:focus {
@@ -218,7 +189,7 @@ input:focus {
   }
 }
 
-/* Success/Error States */
+/* Status/Alert Styles - Solid colors, no gradients */
 .alert-success {
   background-color: rgba(61, 214, 140, 0.1);
   border: 1px solid rgba(61, 214, 140, 0.3);
@@ -246,7 +217,7 @@ input:focus {
   margin-bottom: 1rem;
 }
 
-/* Smooth transitions */
+/* Functional transitions only */
 * {
   transition:
     background-color 0.2s ease,
@@ -254,12 +225,11 @@ input:focus {
     color 0.2s ease;
 }
 
-/* Disable transitions for animations */
 .no-transition {
   transition: none;
 }
 
-/* Custom form styles */
+/* Professional form styles */
 select,
 textarea {
   background-color: #242c3c;
@@ -282,7 +252,7 @@ textarea:hover {
   border-color: #3a4352;
 }
 
-/* Table styles (for future use) */
+/* Professional Table styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -304,4 +274,151 @@ table td {
 
 table tr:hover {
   background-color: #1a1f2e;
+}
+
+/* Notification Styles */
+.notifications-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+.notification {
+  background-color: #242c3c;
+  border: 1px solid #2a3342;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-message {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #e4e6eb;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #b0b3b8;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.notification-close:hover {
+  color: #e4e6eb;
+}
+
+/* Status-specific notification colors */
+.notification-success {
+  border-left: 3px solid #3dd68c;
+}
+
+.notification-success .notification-icon {
+  color: #3dd68c;
+}
+
+.notification-error,
+.notification-danger {
+  border-left: 3px solid #ff4757;
+}
+
+.notification-error .notification-icon,
+.notification-danger .notification-icon {
+  color: #ff4757;
+}
+
+.notification-warning {
+  border-left: 3px solid #ffd000;
+}
+
+.notification-warning .notification-icon {
+  color: #ffd000;
+}
+
+.notification-info {
+  border-left: 3px solid #00d9ff;
+}
+
+.notification-info .notification-icon {
+  color: #00d9ff;
+}
+
+.notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background-color: #00d9ff;
+  animation: progressBar 5s ease-out forwards;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
+/* Remove AI-generated visual indicators */
+.emoji-icon {
+  display: none;
+}
+
+.ai-badge {
+  display: none;
+}
+
+.generated-watermark {
+  display: none;
+}
+
+.gradient-text {
+  color: inherit;
+  background: none;
+}
+
+/* Clean button styling - No decorative effects */
+button {
+  border-radius: 8px;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Override any gradient backgrounds */
+.gradient-bg,
+.gradient-animation {
+  background: none !important;
+  animation: none !important;
 }

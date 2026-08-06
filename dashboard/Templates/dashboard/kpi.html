@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}KPIs - Dashboard{% endblock %}
-{% block page_title %}📊 Key Performance Indicators (KPIs){% endblock %}
+{% block page_title %}Key Performance Indicators (KPIs){% endblock %}
 
 {% block header_actions %}
 <div style="display: flex; gap: 1rem;">
@@ -39,20 +39,19 @@
                             <div class="indicator-card" style="border-left: 4px solid #00d9ff;">
                                 <div class="indicator-header">
                                     <div>
-                                        <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <span style="font-size: 1.2rem;">📈</span>
+                                        <div class="indicator-name">
                                             {{ kpi.name }}
                                         </div>
                                         <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kpi.kind }} • {{ kpi.get_nature_display }}</div>
                                     </div>
                                     {% if kpi.latest_value %}
-                                    <span class="status-badge" style="background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                    <span class="status-badge status-success" style="padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid #3dd68c;">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #3dd68c; display: inline-block; margin-right: 0.5rem;"></span>
                                         Active
                                     </span>
                                     {% else %}
-                                    <span class="status-badge" style="background: #444; color: #999; padding: 0.5rem 0.75rem; border-radius: 4px;">
-                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                    <span class="status-badge" style="background: #242c3c; color: #999; padding: 0.5rem 0.75rem; border-radius: 4px; border: 1px solid #2a3342;">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #999; display: inline-block; margin-right: 0.5rem;"></span>
                                         No Data
                                     </span>
                                     {% endif %}
@@ -102,56 +101,33 @@
 
         {% if kpis %}
             <div class="grid grid-cols-2">
-                {% for kpi in kpis %}
-                <a href="{% url 'kpi_detail' kpi.pk %}" style="text-decoration: none;">
-                    <div class="indicator-card" style="border-left: 4px solid #00d9ff;">
-                        <div class="indicator-header">
-                            <div>
-                                <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 1.2rem;">📈</span>
-                                    {{ kpi.name }}
-                                </div>
-                                <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kpi.kind }} • {{ kpi.get_nature_display }}</div>
-                            </div>
-                            {% if kpi.latest_value %}
-                            <span class="status-badge" style="background: linear-gradient(135deg, #00d9ff 0%, #0099cc 100%); color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
-                                Active
-                            </span>
-                            {% else %}
-                            <span class="status-badge" style="background: #444; color: #999; padding: 0.5rem 0.75rem; border-radius: 4px;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
-                                No Data
-                            </span>
-                            {% endif %}
-                        </div>
-
-                        <div class="indicator-value" style="margin: 1.5rem 0;">
-                            <span class="value-number" style="font-size: 2.5rem; color: #00d9ff; font-weight: bold;">{{ kpi.latest_value|default:"—" }}</span>
-                            {% if kpi.nature %}
-                            <span class="value-unit" style="margin-left: 0.5rem; color: #00d9ff;">
-                                {% if kpi.nature == 'PCT' %}%
-                                {% elif kpi.nature == 'DUR' %}days
-                                {% else %}units{% endif %}
-                            </span>
-                            {% endif %}
-                        </div>
-
-                        <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 1rem;">
-                            Formula: <span style="color: #e4e6eb;">{{ kpi.formula|truncatewords:8 }}</span>
-                        </div>
-
-                        <div class="indicator-footer" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #2a3342;">
-                            {% if kpi.latest_date %}
-                            <span style="font-size: 0.8rem; color: #888;">Updated: {{ kpi.latest_date|date:"M d, H:i" }}</span>
-                            {% else %}
-                            <span style="font-size: 0.8rem; color: #888;">No measurements yet</span>
-                            {% endif %}
-                            <span style="color: #00d9ff; font-size: 0.9rem;">→</span>
-                        </div>
-                    </div>
-                </a>
-                {% endfor %}
+{% for kpi in kpis %}
+    <tr>
+        <td>{{ kpi.name }}</td>
+        <td>{{ kpi.current_value|floatformat:2 }}</td>
+        <td>
+            {% if kpi.target_value %}
+                <span style="color: {{ kpi.performance_color }}; font-weight: 500;">
+                    {% if kpi.target_diff >= 0 %}+{% endif %}
+                    {{ kpi.target_diff|floatformat:2 }}
+                    <small>({{ kpi.target_diff_percentage|floatformat:1 }}%)</small>
+                </span>
+            {% else %}
+                <span class="text-muted">N/A</span>
+            {% endif %}
+        </td>
+        <td>
+            <span class="badge bg-{% if kpi.performance_status == 'above_target' %}success
+                              {% elif kpi.performance_status == 'near_target' %}warning
+                              {% elif kpi.performance_status == 'below_target' %}warning
+                              {% elif kpi.performance_status == 'far_below_target' %}danger
+                              {% else %}secondary{% endif %}">
+                {{ kpi.performance_label }}
+            </span>
+        </td>
+        <td>{{ kpi.latest_date|date:"Y-m-d H:i"|default:"N/A" }}</td>
+    </tr>
+{% endfor %}
             </div>
         {% else %}
             <div style="text-align: center; padding: 3rem 1rem; color: #b0b3b8;">

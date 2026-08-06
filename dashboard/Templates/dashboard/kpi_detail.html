@@ -337,13 +337,15 @@ header_actions %}
             >
               Variance
             </div>
-            <div
-              style="color: {% if kpi.target_value and kpi.current_value >= kpi.target_value %}#3dd68c{% elif kpi.target_value %}#ffd000{% else %}#b0b3b8{% endif %}; font-weight: 500;"
-            >
-              {% if kpi.target_value %} {% with
-              diff=kpi.current_value|add:"-"|add:kpi.target_value %} {{
-              diff|floatformat:2 }} {% endwith %} {% else %} N/A {% endif %}
-            </div>
+            {% if kpi.target_value %}
+    <span style="color: {{ kpi.status_color }}; font-weight: 500;">
+        {% if kpi.difference_from_target >= 0 %}+{% endif %}
+        {{ kpi.difference_from_target|floatformat:2 }}
+        <small>({{ kpi.difference_percentage|floatformat:1 }}%)</small>
+    </span>
+{% else %}
+    <span class="text-muted">N/A</span>
+{% endif %}
           </div>
         </div>
       </div>
@@ -405,3 +407,4 @@ header_actions %}
   </div>
 </div>
 {% endblock %}
+
