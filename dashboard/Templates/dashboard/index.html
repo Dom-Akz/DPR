@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - KPI/KRI{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div>
+    <div style="margin-bottom: 2rem;">
+        {% if is_superuser %}
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Welcome, {{ user.get_full_name|default:user.username }} (Superuser)</h2>
+        <p style="color: #b0b3b8;">View consolidated metrics across all Niveau levels</p>
+        {% else %}
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+        <p style="color: #b0b3b8;">{{ user.get_niveau_display }} - Niveau Level</p>
+        {% endif %}
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-3">
+        <div class="indicator-card">
+            <div class="indicator-name">KPIs</div>
+            <div style="margin-top: 1rem;">
+                <div class="value-number">{{ kpi_count }}</div>
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-top: 0.5rem;">
+                    {% if is_superuser %}
+                    Across all levels
+                    {% else %}
+                    In your level
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="indicator-card">
+            <div class="indicator-name">KRIs</div>
+            <div style="margin-top: 1rem;">
+                <div class="value-number">{{ kri_count }}</div>
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-top: 0.5rem;">
+                    {% if is_superuser %}
+                    Across all levels
+                    {% else %}
+                    In your level
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="indicator-card">
+            <div class="indicator-name">Status</div>
+            <div style="margin-top: 1rem;">
+                <div style="color: #3dd68c; font-size: 1.5rem; font-weight: bold;">Active</div>
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-top: 0.5rem;">System operational</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem; color: #e4e6eb;">Quick Access</h3>
+        <div class="grid grid-cols-2">
+            <a href="{% url 'kpi_list' %}" style="text-decoration: none;">
+                <div class="indicator-card">
+                    <div class="indicator-name">View KPIs</div>
+                    <p style="color: #b0b3b8; font-size: 0.875rem; margin-top: 0.5rem;">Key Performance Indicators</p>
+                    <div style="margin-top: 1rem; color: #00d9ff; font-size: 0.875rem; font-weight: 500;">
+                        Browse → 
+                    </div>
+                </div>
+            </a>
+            <a href="{% url 'kri_list' %}" style="text-decoration: none;">
+                <div class="indicator-card">
+                    <div class="indicator-name">View KRIs</div>
+                    <p style="color: #b0b3b8; font-size: 0.875rem; margin-top: 0.5rem;">Key Risk Indicators</p>
+                    <div style="margin-top: 1rem; color: #00d9ff; font-size: 0.875rem; font-weight: 500;">
+                        Browse → 
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    {% if is_superuser %}
+    <!-- Superuser Info -->
+    <div style="margin-top: 2rem; padding: 1.5rem; background-color: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <svg style="width: 24px; height: 24px; color: #00d9ff;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a10 10 0 0 0-9.95 9m19.9 0a10 10 0 0 0-16.88-5.3"></path>
+            </svg>
+            <span style="font-weight: 600; color: #00d9ff;">Superuser Access</span>
+        </div>
+        <p style="color: #b0b3b8; font-size: 0.875rem;">You have access to all KPI/KRI levels. Navigate to KPI or KRI sections to view consolidated metrics or switch between specific levels.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

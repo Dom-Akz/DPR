@@ -22,3 +22,13 @@ document.getElementById("loginForm").addEventListener("submit", function () {
   btn.classList.add("loading");
   btn.disabled = true;
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const messageContainer = document.getElementById("message-container");
+  if (messageContainer) {
+    // Remove messages from DOM
+    messageContainer.style.display = "none";
+    // Or completely remove them
+    // messageContainer.remove();
+  }
+});

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Dashboard{% endblock %}
+{% block page_title %}User Profile{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px;">
+    <!-- Profile Card -->
+    <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #2a3342;">
+            <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, #00d9ff, #9d4edd); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; flex-shrink: 0;">
+                {{ user.first_name|default:user.username|first|upper }}
+            </div>
+            <div style="flex: 1;">
+                <h1 style="font-size: 1.5rem; margin-bottom: 0.5rem;">{{ user.get_full_name|default:user.username }}</h1>
+                <p style="color: #b0b3b8; margin-bottom: 0.75rem;">@{{ user.username }}</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div>
+                        <span style="display: inline-block; padding: 0.5rem 1rem; background-color: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 6px; color: #00d9ff; font-size: 0.875rem; font-weight: 500;">
+                            {{ user.get_niveau_display }}
+                        </span>
+                    </div>
+                    {% if user.is_superuser %}
+                    <div>
+                        <span style="display: inline-block; padding: 0.5rem 1rem; background-color: rgba(157, 78, 221, 0.1); border: 1px solid rgba(157, 78, 221, 0.2); border-radius: 6px; color: #9d4edd; font-size: 0.875rem; font-weight: 500;">
+                            Superuser
+                        </span>
+                    </div>
+                    {% elif user.is_staff %}
+                    <div>
+                        <span style="display: inline-block; padding: 0.5rem 1rem; background-color: rgba(255, 208, 0, 0.1); border: 1px solid rgba(255, 208, 0, 0.2); border-radius: 6px; color: #ffd000; font-size: 0.875rem; font-weight: 500;">
+                            Staff
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.125rem; margin-bottom: 1rem; color: #e4e6eb;">Account Information</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">First Name</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.first_name|default:"Not set" }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Last Name</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.last_name|default:"Not set" }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.email|default:"Not set" }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Department</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.department|default:"Not assigned" }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Access Level</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.get_niveau_display }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Member Since</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 8px; color: #e4e6eb;">
+                        {{ user.date_joined|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Login -->
+        <div style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #2a3342;">
+            <label style="display: block; font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.5rem; font-weight: 500;">Last Login</label>
+            <div style="color: #e4e6eb;">
+                {% if user.last_login %}
+                    {{ user.last_login|date:"M d, Y H:i" }}
+                {% else %}
+                    Never logged in
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Access Levels Info -->
+    {% if user.is_superuser %}
+    <div style="background-color: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <svg style="width: 24px; height: 24px; color: #00d9ff; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path>
+            </svg>
+            <div>
+                <h3 style="font-weight: 600; color: #00d9ff; margin-bottom: 0.5rem;">Superuser Access</h3>
+                <p style="color: #b0b3b8; font-size: 0.875rem;">
+                    You have full administrative access to all KPI/KRI levels (N0, N1, N2, N3) and can view consolidated metrics across the entire organization.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="background-color: rgba(61, 214, 140, 0.05); border: 1px solid rgba(61, 214, 140, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <svg style="width: 24px; height: 24px; color: #3dd68c; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+            </svg>
+            <div>
+                <h3 style="font-weight: 600; color: #3dd68c; margin-bottom: 0.5rem;">Limited Access</h3>
+                <p style="color: #b0b3b8; font-size: 0.875rem;">
+                    You have access to the <strong style="color: #e4e6eb;">{{ user.get_niveau_display }}</strong> level. You can view KPIs and KRIs relevant to your access level only.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Security Info -->
+    <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem; color: #e4e6eb;">Security</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #2a3342;">
+            <div>
+                <p style="color: #e4e6eb; margin-bottom: 0.25rem;">Password</p>
+                <p style="color: #b0b3b8; font-size: 0.875rem;">Last changed: Not available in this view</p>
+            </div>
+            <button style="padding: 0.625rem 1.25rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 6px; color: #00d9ff; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#00d9ff'" onmouseout="this.style.borderColor='#2a3342'">
+                Change Password
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

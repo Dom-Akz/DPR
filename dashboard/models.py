@@ -102,6 +102,40 @@ class Indicator(models.Model):
         verbose_name_plural = "Indicateurs"
         ordering = ["level", "kind", "name"]
 
+    @property
+    def latest_measurement(self):
+        """Get the latest measurement for this indicator"""
+        return self.measurements.first()
+
+    @property
+    def latest_value(self):
+        """Get the latest value for this indicator"""
+        latest = self.measurements.first()
+        return latest.value if latest else None
+
+    @property
+    def latest_date(self):
+        """Get the latest date for this indicator"""
+        latest = self.measurements.first()
+        return latest.calculated_at if latest else None
+
+    @property
+    def risk_status(self):
+        """Determine risk status based on latest value (only for KRI)"""
+        if self.kind != "KRI":
+            return None
+
+        value = self.latest_value
+        if value is None:
+            return "green"
+
+        if value > 50:
+            return "red"
+        elif value > 20:
+            return "yellow"
+        else:
+            return "green"
+
 
 class IndicatorMeasurement(models.Model):
     indicator = models.ForeignKey(

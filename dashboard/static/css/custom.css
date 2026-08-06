@@ -1,0 +1,307 @@
+/* Custom Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.sidebar {
+  animation: slideIn 0.3s ease-out;
+}
+
+.indicator-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.status-badge {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading State */
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Hover Effects */
+.indicator-card:hover {
+  animation: none;
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 8px;
+  background-color: #242c3c;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d9ff, #9d4edd);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-bar-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: #242c3c;
+  border: 1px solid #2a3342;
+  color: #e4e6eb;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f1419;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a3342;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4352;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid #2a3342;
+  }
+
+  .main-content {
+    order: 1;
+  }
+
+  .sidebar {
+    order: 2;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .sidebar,
+  .header {
+    display: none;
+  }
+
+  .content {
+    padding: 0;
+  }
+
+  .indicator-card {
+    break-inside: avoid;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dark mode override (in case browser forces light mode) */
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #0f1419;
+    color: #e4e6eb;
+  }
+}
+
+/* Focus states for keyboard navigation */
+button:focus,
+a:focus,
+input:focus {
+  outline: 2px solid #00d9ff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .status-badge {
+    border-width: 2px;
+  }
+
+  .btn {
+    border-width: 2px;
+  }
+}
+
+/* Success/Error States */
+.alert-success {
+  background-color: rgba(61, 214, 140, 0.1);
+  border: 1px solid rgba(61, 214, 140, 0.3);
+  color: #3dd68c;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.alert-error {
+  background-color: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  color: #ff4757;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.alert-warning {
+  background-color: rgba(255, 208, 0, 0.1);
+  border: 1px solid rgba(255, 208, 0, 0.3);
+  color: #ffd000;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Disable transitions for animations */
+.no-transition {
+  transition: none;
+}
+
+/* Custom form styles */
+select,
+textarea {
+  background-color: #242c3c;
+  border: 1px solid #2a3342;
+  border-radius: 8px;
+  color: #e4e6eb;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+select:focus,
+textarea:focus {
+  border-color: #00d9ff;
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+}
+
+select:hover,
+textarea:hover {
+  border-color: #3a4352;
+}
+
+/* Table styles (for future use) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th {
+  background-color: #242c3c;
+  color: #b0b3b8;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #2a3342;
+}
+
+table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #2a3342;
+}
+
+table tr:hover {
+  background-color: #1a1f2e;
+}

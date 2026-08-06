@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}KRIs - Dashboard{% endblock %}
+{% block page_title %}Key Risk Indicators (KRIs){% endblock %}
+
+{% block header_actions %}
+<div style="display: flex; gap: 1rem;">
+    {% if is_superuser %}
+    <select id="niveau-filter" style="padding: 0.625rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 6px; color: #e4e6eb; cursor: pointer;">
+        <option value="all">All Levels</option>
+        <option value="N0">Technical (N0)</option>
+        <option value="N1">Operational (N1)</option>
+        <option value="N2">Management (N2)</option>
+        <option value="N3">Executive (N3)</option>
+    </select>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div>
+    {% if is_superuser %}
+        <!-- Superuser View: Tabs by Niveau -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; border-bottom: 1px solid #2a3342; margin-bottom: 2rem; flex-wrap: wrap;">
+                {% for niveau, label in niveau_tabs %}
+                <button class="niveau-tab" data-niveau="{{ niveau }}" style="padding: 1rem; background: none; border: none; color: #b0b3b8; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 500; transition: all 0.2s ease;" onclick="switchNiveau(this, '{{ niveau }}')">
+                    {{ label }}
+                </button>
+                {% endfor %}
+            </div>
+
+            {% for niveau, kris in kris_by_level.items %}
+            <div id="niveau-{{ niveau }}" class="niveau-content" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                {% if kris %}
+                    <div class="grid grid-cols-2">
+                        {% for kri in kris %}
+                        <a href="{% url 'kri_detail' kri.pk %}" style="text-decoration: none;">
+                            <div class="indicator-card" style="border-left: 4px solid {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                <div class="indicator-header">
+                                    <div>
+                                        <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span style="font-size: 1.2rem;">⚠️</span>
+                                            {{ kri.name }}
+                                        </div>
+                                        <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kri.kind }} • {{ kri.get_nature_display }}</div>
+                                    </div>
+                                    <span class="status-badge" style="background: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                        {% if kri.risk_status == 'red' %}Critical{% elif kri.risk_status == 'yellow' %}Warning{% else %}Safe{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="indicator-value" style="margin: 1.5rem 0;">
+                                    <span class="value-number" style="font-size: 2.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-weight: bold;">{{ kri.latest_value|default:"—" }}</span>
+                                    {% if kri.nature %}
+                                    <span class="value-unit" style="margin-left: 0.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                        {% if kri.nature == 'PCT' %}%
+                                        {% elif kri.nature == 'DUR' %}days
+                                        {% else %}units{% endif %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+
+                                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 1rem;">
+                                    Objective: <span style="color: #e4e6eb;">{{ kri.objective|truncatewords:8 }}</span>
+                                </div>
+
+                                <div class="indicator-footer" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #2a3342;">
+                                    {% if kri.latest_date %}
+                                    <span style="font-size: 0.8rem; color: #888;">Updated: {{ kri.latest_date|date:"M d, H:i" }}</span>
+                                    {% else %}
+                                    <span style="font-size: 0.8rem; color: #888;">No measurements yet</span>
+                                    {% endif %}
+                                    <span style="color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-size: 0.9rem;">→</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 1rem; color: #b0b3b8;">
+                        <p style="font-size: 1rem; margin-bottom: 0.5rem;">No KRIs available for this level</p>
+                        <p style="font-size: 0.875rem;">Start by adding KRIs in the admin panel</p>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Regular User View: Single Niveau -->
+        <div style="margin-bottom: 1.5rem;">
+            <p style="color: #b0b3b8; margin-bottom: 1rem;">Viewing KRIs for: <strong style="color: #00d9ff;">{{ user_niveau }}</strong></p>
+        </div>
+
+        {% if kris %}
+            <div class="grid grid-cols-2">
+                {% for kri in kris %}
+                <a href="{% url 'kri_detail' kri.pk %}" style="text-decoration: none;">
+                    <div class="indicator-card" style="border-left: 4px solid {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                        <div class="indicator-header">
+                            <div>
+                                <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">⚠️</span>
+                                    {{ kri.name }}
+                                </div>
+                                <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kri.kind }} • {{ kri.get_nature_display }}</div>
+                            </div>
+                            <span class="status-badge" style="background: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                {% if kri.risk_status == 'red' %}Critical{% elif kri.risk_status == 'yellow' %}Warning{% else %}Safe{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="indicator-value" style="margin: 1.5rem 0;">
+                            <span class="value-number" style="font-size: 2.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-weight: bold;">{{ kri.latest_value|default:"—" }}</span>
+                            {% if kri.nature %}
+                            <span class="value-unit" style="margin-left: 0.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                {% if kri.nature == 'PCT' %}%
+                                {% elif kri.nature == 'DUR' %}days
+                                {% else %}units{% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 1rem;">
+                            Objective: <span style="color: #e4e6eb;">{{ kri.objective|truncatewords:8 }}</span>
+                        </div>
+
+                        <div class="indicator-footer" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #2a3342;">
+                            {% if kri.latest_date %}
+                            <span style="font-size: 0.8rem; color: #888;">Updated: {{ kri.latest_date|date:"M d, H:i" }}</span>
+                            {% else %}
+                            <span style="font-size: 0.8rem; color: #888;">No measurements yet</span>
+                            {% endif %}
+                            <span style="color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-size: 0.9rem;">→</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: #b0b3b8;">
+                <p style="font-size: 1rem; margin-bottom: 0.5rem;">No KRIs available for your level</p>
+                <p style="font-size: 0.875rem;">Contact your administrator for more information</p>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+    function switchNiveau(element, niveau) {
+        // Hide all contents
+        document.querySelectorAll('.niveau-content').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        // Show selected content
+        document.getElementById('niveau-' + niveau).style.display = 'block';
+
+        // Update tab styling
+        document.querySelectorAll('.niveau-tab').forEach(tab => {
+            tab.style.borderBottomColor = 'transparent';
+            tab.style.color = '#b0b3b8';
+        });
+        element.style.borderBottomColor = '#00d9ff';
+        element.style.color = '#00d9ff';
+    }
+
+    // Initialize first tab
+    document.querySelector('.niveau-tab').click();
+</script>
+
+<style>
+    .niveau-tab:hover {
+        color: #00d9ff;
+    }
+</style>
+{% endblock %}
