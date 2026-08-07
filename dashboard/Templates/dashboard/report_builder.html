@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Report · ONEE{% endblock %}
+
+{% block page_title %}Generate Report{% endblock %}
+
+{% block content %}
+  <style>
+    .report-hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      background: linear-gradient(135deg, #102a43 0%, #1b5367 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 28px rgba(16, 42, 67, .14);
+    }
+
+    .report-hero h2 {
+      margin: 6px 0 8px;
+      font-size: 28px;
+      letter-spacing: -.02em;
+    }
+
+    .report-hero p {
+      margin: 0;
+      color: #c9e2e6;
+      max-width: 680px;
+    }
+
+    .report-hero-mark {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px;
+      flex: none;
+    }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 5px 16px rgba(16, 42, 67, .05);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .panel h3 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 18px;
+    }
+
+    .panel-subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      background: #f4f8fa;
+      border: 1px solid #e4edf2;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filter-grid .field select {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .field input[type=text] {
+      font-size: 15px;
+      padding: 12px 13px;
+    }
+
+    .selection-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .selection-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .indicator-list {
+      display: grid;
+      gap: 9px;
+      max-height: 430px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .indicator-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border: 1px solid #e1eaf0;
+      border-radius: 10px;
+      padding: 13px;
+      background: #fff;
+      transition: .15s;
+    }
+
+    .indicator-option:hover {
+      border-color: #70b9bd;
+      background: #f7fcfc;
+    }
+
+    .indicator-option input {
+      margin-top: 4px;
+      accent-color: var(--teal);
+    }
+
+    .indicator-copy {
+      min-width: 0;
+    }
+
+    .indicator-name {
+      display: block;
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .indicator-meta {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #e4f4f3;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 5px;
+    }
+
+    .format-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .format-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid #e1eaf0;
+      border-radius: 10px;
+      padding: 13px;
+      cursor: pointer;
+    }
+
+    .format-option:has(input:checked) {
+      border-color: var(--teal);
+      background: #f0faf9;
+      box-shadow: 0 0 0 2px #d8f1ef;
+    }
+
+    .format-option input {
+      accent-color: var(--teal);
+    }
+
+    .format-title {
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .format-hint {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .preview {
+      background: #f4f8fa;
+      border: 1px dashed #bfd0da;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .preview-paper {
+      background: #fff;
+      min-height: 410px;
+      border: 1px solid #e1e8ed;
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 7px 16px rgba(16, 42, 67, .06);
+    }
+
+    .preview-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--teal);
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+    }
+
+    .preview-brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .preview-brand strong {
+      color: var(--navy);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .preview-paper h4 {
+      font-size: 22px;
+      margin: 0 0 8px;
+      color: var(--navy);
+    }
+
+    .preview-paper p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 22px;
+    }
+
+    .preview-lines {
+      display: grid;
+      gap: 10px;
+    }
+
+    .preview-line {
+      height: 10px;
+      border-radius: 99px;
+      background: #e8eff3;
+    }
+
+    .preview-line.short {
+      width: 62%;
+    }
+
+    .preview-line.medium {
+      width: 82%;
+    }
+
+    .preview-table {
+      display: grid;
+      grid-template-columns: 1.6fr .6fr .8fr;
+      gap: 6px;
+      margin-top: 28px;
+    }
+
+    .preview-cell {
+      height: 25px;
+      background: #edf4f5;
+      border-radius: 3px;
+    }
+
+    .preview-cell.header {
+      background: #cde9e7;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    .actions .btn-primary {
+      flex: 1;
+      text-align: center;
+    }
+
+    .muted-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+
+    @media(max-width:900px) {
+      .report-layout {
+        grid-template-columns: 1fr;
+      }
+      .report-hero {
+        padding: 22px;
+      }
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media(max-width:560px) {
+      .content {
+        padding: 22px 16px;
+      }
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+      .report-hero-mark {
+        display: none;
+      }
+      .panel {
+        padding: 18px;
+      }
+    }
+  </style>
+
+  <!-- Hero Section -->
+  <div class="report-hero">
+    <div>
+      <div class="eyebrow">Administration · Distribution</div>
+      <h2>Compose a Management Report</h2>
+      <p>
+        Select the indicators to share, apply your filters, and export a 
+        professional document ready for presentation.
+      </p>
+    </div>
+    <img class="report-hero-mark" src="/media/onee.png" alt="ONEE">
+  </div>
+
+  <!-- Main Layout -->
+  <div class="report-layout">
+    <!-- Left Column: Configuration -->
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>1. Report Scope</h3>
+          <p class="panel-subtitle">
+            Refine the content before selecting indicators.
+          </p>
+        </div>
+        <span class="tag">{{ indicators|length }} available</span>
+      </div>
+
+      <!-- Filter Form -->
+<form method="get" class="filter-grid"><div class="field"><label for="kind">Type de données</label><select id="kind" name="kind" onchange="this.form.submit()"><option value="all" {% if kind == 'all' %}selected{% endif %}>KPIs + KRIs</option><option value="KPI" {% if kind == 'KPI' %}selected{% endif %}>KPIs uniquement</option><option value="KRI" {% if kind == 'KRI' %}selected{% endif %}>KRIs uniquement</option></select></div>{% if can_filter_solution %}<div class="field"><label for="solution">Solution</label><select id="solution" name="solution" onchange="this.form.submit()"><option value="all">Toutes les solutions</option>{% for solution in solutions %}<option value="{{ solution.pk }}" {% if selected_solution == solution.pk|stringformat:'s' %}selected{% endif %}>{{ solution.name }}</option>{% endfor %}</select></div>{% endif %}{% if can_filter_level %}<div class="field"><label for="level">Niveau</label><select id="level" name="level" onchange="this.form.submit()"><option value="all">Tous les niveaux</option>{% for code,label in levels %}<option value="{{ code }}" {% if selected_level == code %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>{% endif %}</form>
+      <!-- Main Report Form -->
+      <form method="post">
+        {% csrf_token %}
+        
+        <!-- Hidden fields to preserve filter state -->
+        <input type="hidden" name="kind" value="{{ kind }}">
+        <input type="hidden" name="solution" value="{{ selected_solution }}">
+        <input type="hidden" name="level" value="{{ selected_level }}">
+
+        <!-- Report Title -->
+        <div class="field">
+          <label for="title">Report Name</label>
+          <input 
+            id="title" 
+            name="title" 
+            type="text" 
+            value="Cybersecurity Management Report" 
+            required
+          >
+        </div>
+
+        <!-- Selection Bar -->
+        <div class="selection-bar">
+          <div>
+            <h3>Data to Include</h3>
+            <span class="selection-count">
+              Check the items to add to the document.
+            </span>
+          </div>
+          <button 
+            class="btn btn-ghost" 
+            type="button" 
+            onclick="document.querySelectorAll('input[name=indicators]').forEach(i=>i.checked=true)"
+          >
+            Select All
+          </button>
+        </div>
+
+        <!-- Indicator List -->
+        <div class="indicator-list">
+          {% for indicator in indicators %}
+            <label class="indicator-option">
+              <input type="checkbox" name="indicators" value="{{ indicator.pk }}" checked>
+              <span class="indicator-copy">
+                <span class="indicator-name">{{ indicator.name }}</span>
+                <span class="indicator-meta">
+                  <span class="tag">{{ indicator.kind }}</span>
+                  {{ indicator.level }} · 
+                  {% if indicator.solution %}
+                    {{ indicator.solution.name }}
+                  {% else %}
+                    No solution
+                  {% endif %}
+                </span>
+              </span>
+            </label>
+          {% empty %}
+            <p class="muted-note">
+              No indicators match the selected filters.
+            </p>
+          {% endfor %}
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">
+            Generate Report
+          </button>
+        </div>
+
+        <!-- Format Options -->
+        <div class="format-grid">
+          <label class="format-option">
+            <input type="radio" name="format" value="pdf" checked>
+            <span>
+              <span class="format-title">PDF</span>
+              <span class="format-hint">Print-ready presentation</span>
+            </span>
+          </label>
+
+          <label class="format-option">
+            <input type="radio" name="format" value="docx">
+            <span>
+              <span class="format-title">DOCX</span>
+              <span class="format-hint">Editable document</span>
+            </span>
+          </label>
+
+          <label class="format-option">
+            <input type="radio" name="format" value="json">
+            <span>
+              <span class="format-title">JSON</span>
+              <span class="format-hint">Structured data export</span>
+            </span>
+          </label>
+        </div>
+      </form>
+    </section>
+
+    <!-- Right Column: Preview -->
+    <aside class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>2. Document Preview</h3>
+          <p class="panel-subtitle">
+            The ONEE logo will be included in the exported file.
+          </p>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div class="preview-paper">
+          <div class="preview-brand">
+            <img src="dashboard/static/images/onee.png" alt="ONEE Logo">
+            <strong>ONEE · Cybersecurity Department</strong>
+          </div>
+
+          <h4 id="preview-title">Cybersecurity Management Report</h4>
+          <p>KPIs + KRIs · All Solutions</p>
+
+          <div class="preview-lines">
+            <span class="preview-line"></span>
+            <span class="preview-line medium"></span>
+            <span class="preview-line short"></span>
+          </div>
+
+          <div class="preview-table">
+            <span class="preview-cell header"></span>
+            <span class="preview-cell header"></span>
+            <span class="preview-cell header"></span>
+            <span class="preview-cell"></span>
+            <span class="preview-cell"></span>
+            <span class="preview-cell"></span>
+            <span class="preview-cell"></span>
+            <span class="preview-cell"></span>
+            <span class="preview-cell"></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="muted-note">
+        The file will be automatically named from the entered title and 
+        will include the ONEE visual identity.
+      </p>
+    </aside>
+  </div>
+
+  <!-- JavaScript for Live Preview -->
+  <script>
+    const titleInput = document.getElementById('title');
+    const previewTitle = document.getElementById('preview-title');
+    
+    if (titleInput && previewTitle) {
+      titleInput.addEventListener('input', function() {
+        previewTitle.textContent = this.value || 'Cybersecurity Management Report';
+      });
+    }
+  </script>
+{% endblock %}
+

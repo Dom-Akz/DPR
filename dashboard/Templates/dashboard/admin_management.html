@@ -1,0 +1,279 @@
+{% extends 'base.html' %} {% block title %}ONEE · Gestion des administrateurs{% endblock %} {% block content %}
+<style>
+  .admin-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 22px;
+  }
+  .admin-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(16, 42, 67, 0.06);
+    overflow: hidden;
+  }
+  .admin-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .admin-card-head h2 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 18px;
+  }
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .admin-table th,
+  .admin-table td {
+    text-align: left;
+    padding: 15px 18px;
+    border-bottom: 1px solid #edf2f5;
+  }
+  .admin-table th {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: #fbfcfd;
+  }
+  .admin-table td {
+    font-size: 14px;
+  }
+  .admin-name {
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .admin-email {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .badge {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .badge-active {
+    background: #e6f7ef;
+    color: #157347;
+  }
+  .badge-inactive {
+    background: #fbecec;
+    color: #a33b3b;
+  }
+  .admin-actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .mini-btn {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    padding: 7px 9px;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .mini-btn.danger {
+    color: #a33b3b;
+    border-color: #f1cccc;
+  }
+  .admin-form {
+    padding: 22px 24px;
+  }
+  .admin-form h2 {
+    margin: 0 0 18px;
+    color: var(--navy);
+    font-size: 18px;
+  }
+  .admin-form .field {
+    margin-bottom: 14px;
+  }
+  .admin-form .field input,
+  .admin-form .field select {
+    width: 100%;
+    min-width: 0;
+  }
+  .form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .empty {
+    padding: 34px;
+    text-align: center;
+    color: var(--muted);
+  }
+  @media (max-width: 1000px) {
+    .admin-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 680px) {
+    .content {
+      padding: 22px 16px;
+    }
+    .admin-card {
+      overflow-x: auto;
+    }
+    .admin-table {
+      min-width: 720px;
+    }
+  }
+</style>
+<div class="page-head">
+  <div>
+    <div class="eyebrow">Administration · accès superuser</div>
+    <h1>Gestion des administrateurs</h1>
+    <p class="lead">
+      Créez, modifiez et contrôlez les accès des administrateurs de la
+      plateforme.
+    </p>
+  </div>
+  <div class="stat">
+    <strong>{{ admins|length }}</strong><span>Administrateurs</span>
+  </div>
+</div>
+<div class="admin-grid">
+  <section class="admin-card">
+    <div class="admin-card-head">
+      <h2>Comptes administrateurs</h2>
+      <span class="muted"
+        >{{ admins|length }} compte{{ admins|length|pluralize }}</span
+      >
+    </div>
+    {% if admins %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Administrateur</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for admin in admins %}
+        <tr>
+          <td>
+            <div class="admin-name">
+              {{ admin.get_full_name|default:admin.username }}
+            </div>
+            <div class="admin-email">
+              {{ admin.email|default:admin.username }}
+            </div>
+          </td>
+          <td>{{ admin.get_role_display|default:'-' }}</td>
+          <td>
+            {% if admin.is_active %}<span class="badge badge-active">Actif</span
+            >{% else %}<span class="badge badge-inactive">Inactif</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="admin-actions">
+              <a class="mini-btn" href="?edit={{ admin.pk }}">Modifier</a>
+              <form method="post" action="{% url 'admin_toggle' admin.pk %}">
+                {% csrf_token %}<button class="mini-btn" type="submit">
+                  {% if admin.is_active %}Désactiver{% else %}Activer{% endif %}
+                </button>
+              </form>
+              <form
+                method="post"
+                action="{% url 'admin_delete' admin.pk %}"
+                onsubmit="return confirm('Supprimer cet administrateur ?');"
+              >
+                {% csrf_token %}<button class="mini-btn danger" type="submit">
+                  Supprimer
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">Aucun administrateur trouvé.</div>
+    {% endif %}
+  </section>
+  <aside class="admin-card">
+    <form
+      class="admin-form"
+      method="post"
+      action="{% if edit_admin %}{% url 'admin_update' edit_admin.pk %}{% else %}{% url 'admin_create' %}{% endif %}"
+    >
+      {% csrf_token %}
+      <h2>
+        {% if edit_admin %}Modifier le compte{% else %}Nouvel administrateur 
+        {% endif %}
+      </h2>
+      <div class="field">
+        <label for="nom">Nom</label
+        ><input
+          id="nom"
+          name="nom"
+          value="{{ edit_admin.nom|default:'' }}"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="prenom">Prénom</label
+        ><input
+          id="prenom"
+          name="prenom"
+          value="{{ edit_admin.prenom|default:'' }}"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="email">Email</label
+        ><input
+          id="email"
+          name="email"
+          type="email"
+          value="{{ edit_admin.email|default:'' }}"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="role">Rôle</label
+        ><select id="role" name="role" required>
+          <option value="">Sélectionner un niveau</option>
+          {% for value,label in roles %}
+          <option
+            value="{{ value }}"
+            {%
+            if
+            edit_admin.role=""
+            ="value"
+            %}selected{%
+            endif
+            %}
+          >
+            {{ label }}
+          </option>
+
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">
+          {% if edit_admin %}Enregistrer{% else %}Créer le compte{% endif %}</button
+        >{% if edit_admin %}<a
+          class="btn btn-ghost"
+          href="{% url 'admin_management' %}"
+          >Annuler</a
+        >{% endif %}
+      </div>
+    </form>
+  </aside>
+</div>
+{% endblock %}

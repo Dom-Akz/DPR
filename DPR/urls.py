@@ -23,4 +23,22 @@ urlpatterns = [
         views.api_update_indicator,
         name="api_update_indicator",
     ),
+    path("admin/dashboard/admins/", views.admin_management, name="admin_management"),
+    path("admin/dashboard/admins/create/", views.admin_create, name="admin_create"),
+    path(
+        "admin/dashboard/admins/<int:pk>/update/",
+        views.admin_update,
+        name="admin_update",
+    ),
+    path(
+        "admin/dashboard/admins/<int:pk>/toggle/",
+        views.admin_toggle,
+        name="admin_toggle",
+    ),
+    path(
+        "admin/dashboard/admins/<int:pk>/delete/",
+        views.admin_delete,
+        name="admin_delete",
+    ),
+    path("admin/dashboard/reports/", views.report_builder, name="report_builder"),
 ]

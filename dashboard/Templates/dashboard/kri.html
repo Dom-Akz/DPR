@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block title %}{{ kri.name }} - KRI Detail{%
+{% extends 'base.html' %}
+{% load math_filters %}{% block title %}{{ kri.name }} - KRI Detail{%
 endblock %} {% block page_title %}{{ kri.name }}{% endblock %} {% block
 header_actions %}
 <a href="{% url 'kri_list' %}" class="btn btn-secondary">
@@ -402,9 +403,26 @@ header_actions %}
           Risk Proximity
         </div>
         <div style="color: #e4e6eb; font-weight: 500; font-size: 1rem">
-          {% if kri.risk_threshold %} {% with
-          distance=kri.risk_threshold|add:"-"|add:kri.current_value %} {% if
-          distance <= 0 %}
+           {% if kri.risk_threshold %} 
+           {% with distance=kri.risk_threshold|add:"-"|add:kri.current_value %} 
+           {% if distance <= 0 %}
+          <span style="color: #ff4757">Exceeded</span>
+          {% elif distance <= kri.risk_threshold|mul:0.2 %}
+          <span style="color: #ff4757"
+            >Critical ({{ distance|floatformat:0 }} away)</span
+          >
+          {% elif distance <= kri.risk_threshold|mul:0.5 %}
+          <span style="color: #ffd000"
+            >Warning ({{ distance|floatformat:0 }} away)</span
+          >
+          {% else %}
+          <span style="color: #3dd68c"
+            >Safe ({{ distance|floatformat:0 }} away)</span
+          >
+          {% endif %} {% endwith %} {% else %} No threshold set {% endif %}
+
+          {% if kri.risk_threshold %} {% with distance=kri.risk_threshold|add:"-"|add:kri.current_value %} 
+          {% if distance <= 0 %}
           <span style="color: #ff4757">Exceeded</span>
           {% elif distance <= kri.risk_threshold|mul:0.2 %}
           <span style="color: #ff4757"
