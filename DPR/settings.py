@@ -30,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = "dashboard.Administrateur"
+LOGIN_URL = "two_factor:login"
 
 # Application definition
 
@@ -42,7 +43,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "dashboard",
     "django_smart_ratelimit",
+    "django_otp",
+    "django_otp.plugins.otp_totp",  # TOTP for authenticator apps
+    "django_otp.plugins.otp_static",  # Backup codes
+    "two_factor",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,6 +58,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
 ]
 
 ROOT_URLCONF = "DPR.urls"

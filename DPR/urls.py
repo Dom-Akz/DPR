@@ -1,9 +1,10 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from dashboard import views
-
+from two_factor.urls import urlpatterns as tf_urls
 
 urlpatterns = [
+    path("", include(tf_urls)),
     path("", views.login_u, name="login"),
     path("admin/login/", views.login_u, name="login"),
     path("admin/logout/", views.logout_u, name="logout"),

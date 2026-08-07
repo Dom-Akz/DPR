@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: dpr_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgresql://dpr_user:dpr_password@db:5432/dpr_db
+      - SECRET_KEY=your-secret-key-here-change-in-production
+    depends_on:
+      - db
+    networks:
+      - dpr_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: dpr_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=dpr_user
+      - POSTGRES_PASSWORD=dpr_password
+      - POSTGRES_DB=dpr_db
+    ports:
+      - "5432:5432"
+    networks:
+      - dpr_network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  dpr_network:
