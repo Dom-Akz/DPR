@@ -3,20 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 
-# departement
-class Departement(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    chef_departement = models.CharField(max_length=100)
-    description = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-
-
 # admin
 class Administrateur(AbstractUser):
     ROLE_CHOICES = [
@@ -26,9 +12,6 @@ class Administrateur(AbstractUser):
         ("N0", "Technique (Niveau 1)"),
     ]
 
-    departement = models.ForeignKey(
-        Departement, on_delete=models.SET_NULL, null=True, related_name="admin"
-    )
     role = models.CharField(
         "Rôle",
         max_length=2,
@@ -116,24 +99,20 @@ class Indicator(models.Model):
 
     @property
     def latest_measurement(self):
-        """Get the latest measurement for this indicator"""
         return self.measurements.first()
 
     @property
     def latest_value(self):
-        """Get the latest value for this indicator"""
         latest = self.measurements.first()
         return latest.value if latest else None
 
     @property
     def latest_date(self):
-        """Get the latest date for this indicator"""
         latest = self.measurements.first()
         return latest.calculated_at if latest else None
 
     @property
     def risk_status(self):
-        """Determine risk status based on latest value (only for KRI)"""
         if self.kind != "KRI":
             return None
 
@@ -150,19 +129,16 @@ class Indicator(models.Model):
 
     @property
     def current_value(self):
-        """Alias for latest_value for better readability"""
         return self.latest_value
 
     @property
     def target_diff(self):
-        """Calculate difference from target"""
         if self.current_value is not None and self.target_value is not None:
             return self.current_value - self.target_value
         return None
 
     @property
     def target_diff_percentage(self):
-        """Calculate percentage difference from target"""
         if (
             self.current_value is not None
             and self.target_value
@@ -192,24 +168,22 @@ class Indicator(models.Model):
 
     @property
     def performance_color(self):
-        """Get color for performance status"""
         colors = {
-            "above_target": "#3dd68c",  # green
-            "near_target": "#ffd000",  # yellow
-            "below_target": "#ff9500",  # orange
-            "far_below_target": "#ff4757",  # red
-            "unknown": "#6c757d",  # gray
+            "above_target": "#3dd68c",
+            "near_target": "#ffd000",
+            "below_target": "#ff9500",
+            "far_below_target": "#ff4757",
+            "unknown": "#6c757d",
         }
         return colors.get(self.performance_status, "#6c757d")
 
     @property
     def performance_label(self):
-        """Get human-readable performance label"""
         labels = {
-            "above_target": "✓ On Target",
-            "near_target": "⚠ Near Target",
-            "below_target": "▼ Below Target",
-            "far_below_target": "✗ Far Below",
+            "above_target": "On Target",
+            "near_target": "Near Target",
+            "below_target": "Below Target",
+            "far_below_target": "Far Below",
             "unknown": "— No Target",
         }
         return labels.get(self.performance_status, "Unknown")
@@ -228,11 +202,11 @@ class Indicator(models.Model):
         percentage = self.risk_percentage
 
         if percentage >= 100:
-            return "#ff4757"  # red - critical
+            return "#ff4757"
         elif percentage >= 70:
-            return "#ffd000"  # yellow - warning
+            return "#ffd000"
         else:
-            return "#3dd68c"  # green - normal
+            return "#3dd68c"
 
     @property
     def risk_class(self):
