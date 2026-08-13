@@ -1,0 +1,43 @@
+{
+  "source": "Passerelle Mail",
+  "indicators": [
+    {
+      "name": "% d'emails bloqués vs autorisés",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "statut",
+        "match": "BLOQUE"
+      },
+      "denominator": {
+        "field": "statut",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Taux de disponibilité du service",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "disponible",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "disponible",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Taux de détection par catégorie : spam, phishing, malware en pièce jointe",
+      "op": "ratio_pct_group",
+      "group_field": "categorie",
+      "match": "SPAM,PHISHING,MALWARE",
+      "total_field": "categorie"
+    },
+    {
+      "name": "Délai de blocage rétroactif",
+      "op": "average_duration",
+      "start_field": "ts_distribution",
+      "end_field": "ts_retrait",
+      "unit": "minutes"
+    }
+  ]
+}

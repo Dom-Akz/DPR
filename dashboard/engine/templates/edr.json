@@ -1,0 +1,57 @@
+{
+  "source": "EDR",
+  "indicators": [
+    {
+      "name": "Taux de Faux Positifs",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "classification",
+        "match": "FAUX_POSITIF"
+      },
+      "denominator": {
+        "field": "classification",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Taux de Faux Négatifs",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "classification",
+        "match": "FAUX_NEGATIF"
+      },
+      "denominator": {
+        "field": "classification",
+        "match": "*"
+      }
+    },
+    {
+      "name": "MTTD — délai moyen de détection",
+      "op": "average_duration",
+      "start_field": "ts_event",
+      "end_field": "ts_detection",
+      "unit": "minutes"
+    },
+    {
+      "name": "MTTI — délai moyen d'investigation",
+      "op": "average_duration",
+      "start_field": "ts_detection",
+      "end_field": "ts_investigation",
+      "unit": "minutes"
+    },
+    {
+      "name": "MTTR — délai moyen de remédiation/résolution",
+      "op": "average_duration",
+      "start_field": "ts_detection",
+      "end_field": "ts_remediation",
+      "unit": "minutes"
+    },
+    {
+      "name": "Taux de couverture",
+      "op": "ratio_pct_columns",
+      "numerator_field": "postes_couverts",
+      "denominator_field": "postes_total",
+      "aggregation": "last"
+    }
+  ]
+}

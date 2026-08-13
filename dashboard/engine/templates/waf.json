@@ -1,0 +1,57 @@
+{
+  "source": "WAF",
+  "indicators": [
+    {
+      "name": "SLA de disponibilité",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "disponible",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "disponible",
+        "match": "*"
+      }
+    },
+    {
+      "name": "% de requêtes suspectes bloquées",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "action",
+        "match": "BLOQUE",
+        "filter_field": "type_requete",
+        "filter_match": "SUSPECTE"
+      },
+      "denominator": {
+        "field": "type_requete",
+        "match": "SUSPECTE"
+      }
+    },
+    {
+      "name": "% d'adresses IP bloquées sur le total des requêtes",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "ip_bloquee",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "ip_bloquee",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Précision — Taux de Vrais Positifs (TPR)",
+      "op": "confusion_metric",
+      "truth_field": "verite_terrain",
+      "prediction_field": "prediction",
+      "metric": "TPR"
+    },
+    {
+      "name": "Équilibre global",
+      "op": "confusion_metric",
+      "truth_field": "verite_terrain",
+      "prediction_field": "prediction",
+      "metric": "BALANCED_ACCURACY"
+    }
+  ]
+}

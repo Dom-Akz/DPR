@@ -1,0 +1,34 @@
+{
+  "source": "PAM",
+  "indicators": [
+    {
+      "name": "Niveau de satisfaction client",
+      "op": "average",
+      "field": "note_satisfaction"
+    },
+    {
+      "name": "% de comptes à accès accordé, permanent ou limité dans le temps",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "type_acces",
+        "match": "PERMANENT,LIMITE"
+      },
+      "denominator": {
+        "field": "type_acces",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Taux de rotation/changement des mots de passe à privilèges",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "mdp_change_dans_delai",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "mdp_concerne",
+        "match": "1"
+      }
+    }
+  ]
+}

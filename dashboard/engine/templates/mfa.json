@@ -1,0 +1,41 @@
+{
+  "source": "MFA",
+  "indicators": [
+    {
+      "name": "Taux d'adoption par les utilisateurs",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "mfa_active",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "eligible",
+        "match": "1"
+      }
+    },
+    {
+      "name": "% de contournements (bypass) / échecs d'authentification",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "resultat_auth",
+        "match": "ECHEC,BYPASS"
+      },
+      "denominator": {
+        "field": "resultat_auth",
+        "match": "*"
+      }
+    },
+    {
+      "name": "% de comptes pour lesquels le MFA est rendu obligatoire",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "mfa_obligatoire",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "mfa_obligatoire",
+        "match": "*"
+      }
+    }
+  ]
+}

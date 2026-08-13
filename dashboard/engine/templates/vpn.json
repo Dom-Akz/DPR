@@ -1,0 +1,27 @@
+{
+  "source": "VPN",
+  "indicators": [
+    {
+      "name": "SLA de disponibilité (uptime)",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "disponible",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "disponible",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Version du protocole / du tunnel utilisé",
+      "op": "top_value",
+      "field": "protocole"
+    },
+    {
+      "name": "Nombre de sessions actives à un instant t",
+      "op": "last_value",
+      "field": "sessions_actives"
+    }
+  ]
+}

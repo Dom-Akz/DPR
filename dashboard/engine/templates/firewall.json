@@ -1,0 +1,52 @@
+{
+  "source": "Firewall",
+  "indicators": [
+    {
+      "name": "% d'IP bloquées sur le trafic total",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "action",
+        "match": "BLOCK"
+      },
+      "denominator": {
+        "field": "action",
+        "match": "*"
+      }
+    },
+    {
+      "name": "Port générant le plus de trafic (top port)",
+      "op": "top_value",
+      "field": "port_dst",
+      "weight_field": "octets"
+    },
+    {
+      "name": "Débit (throughput) traité",
+      "op": "sum_per_period",
+      "field": "octets",
+      "period_minutes": 60,
+      "unit": "Mbps"
+    },
+    {
+      "name": "Latence (RTT — temps d'aller-retour au routeur)",
+      "op": "average",
+      "field": "rtt_ms"
+    },
+    {
+      "name": "Gigue (jitter) du trafic",
+      "op": "average",
+      "field": "jitter_ms"
+    },
+    {
+      "name": "Taux de disponibilité (uptime)",
+      "op": "ratio_pct",
+      "numerator": {
+        "field": "disponible",
+        "match": "1"
+      },
+      "denominator": {
+        "field": "disponible",
+        "match": "*"
+      }
+    }
+  ]
+}
