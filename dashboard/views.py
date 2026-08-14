@@ -79,7 +79,7 @@ def dashboard(request):
     }
 
     # If superuser, show consolidated view
-    if request.user.is_superuser or request.user.is_supperuser:
+    if request.user.is_superuser:
         context["is_superuser"] = True
         context["kpi_count"] = Indicator.objects.filter(kind="KPI").count()
         context["kri_count"] = Indicator.objects.filter(kind="KRI").count()
@@ -97,8 +97,7 @@ def dashboard(request):
 
 @login_required(login_url="login")
 def kpi_list(request):
-    """List KPIs - respects user role level"""
-    if request.user.is_superuser or request.user.is_supperuser:
+    if request.user.is_superuser:
         # Superusers see consolidated view with all levels
         kpis_by_level = {}
         for level_code, level_name in Indicator.LEVEL_CHOICES:
@@ -109,11 +108,13 @@ def kpi_list(request):
             )
             # Enrich indicators with latest measurement data
 
-        level_tabs = Indicator.LEVEL_CHOICES
+            kpis_by_level[level_code] = indicators
+
+        niveau_tabs = Indicator.LEVEL_CHOICES
 
         context = {
             "kpis_by_level": kpis_by_level,
-            "level_tabs": level_tabs,
+            "niveau_tabs": niveau_tabs,
             "is_superuser": True,
             "selected_level": request.GET.get("level", "all"),
         }
@@ -136,8 +137,7 @@ def kpi_list(request):
 
 @login_required(login_url="login")
 def kri_list(request):
-    """List KRIs - respects user role level"""
-    if request.user.is_superuser or request.user.is_supperuser:
+    if request.user.is_superuser:
         # Superusers see consolidated view with all levels
         kris_by_level = {}
         for level_code, level_name in Indicator.LEVEL_CHOICES:
@@ -149,11 +149,11 @@ def kri_list(request):
 
             kris_by_level[level_code] = indicators
 
-        level_tabs = Indicator.LEVEL_CHOICES
+        niveau_tabs = Indicator.LEVEL_CHOICES
 
         context = {
             "kris_by_level": kris_by_level,
-            "level_tabs": level_tabs,
+            "niveau_tabs": niveau_tabs,
             "is_superuser": True,
             "selected_level": request.GET.get("level", "all"),
         }

@@ -1,445 +1,165 @@
+
 {% extends 'base.html' %}
-{% load math_filters %}{% block title %}{{ kri.name }} - KRI Detail{%
-endblock %} {% block page_title %}{{ kri.name }}{% endblock %} {% block
-header_actions %}
-<a href="{% url 'kri_list' %}" class="btn btn-secondary">
-  <svg
-    style="width: 18px; height: 18px"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-  >
-    <line x1="19" y1="12" x2="5" y2="12"></line>
-    <polyline points="12 19 5 12 12 5"></polyline>
-  </svg>
-  Back to KRIs
-</a>
-{% endblock %} {% block content %}
-<div style="max-width: 1000px">
-  <!-- Header Card -->
-  <div
-    style="
-      background-color: #1a1f2e;
-      border: 1px solid #2a3342;
-      border-radius: 12px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-    "
-  >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 1.5rem;
-      "
-    >
-      <div>
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem">
-          {{ kri.name }}
-        </h2>
-        {% if kri.description %}
-        <p style="color: #b0b3b8; font-size: 0.95rem">{{ kri.description }}</p>
+
+{% block title %}KRIs - Dashboard{% endblock %}
+{% block page_title %}Key Risk Indicators (KRIs){% endblock %}
+
+
+{% block content %}
+<div>
+    {% if is_superuser %}
+        <!-- Superuser View: Tabs by Niveau -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; border-bottom: 1px solid #2a3342; margin-bottom: 2rem; flex-wrap: wrap;">
+                {% for niveau, label in niveau_tabs %}
+                <button class="niveau-tab" data-niveau="{{ niveau }}" style="padding: 1rem; background: none; border: none; color: #b0b3b8; cursor: pointer; border-bottom: 3px solid transparent; font-weight: 500; transition: all 0.2s ease;" onclick="switchNiveau(this, '{{ niveau }}')">
+                    {{ label }}
+                </button>
+                {% endfor %}
+            </div>
+
+            {% for niveau, kris in kris_by_level.items %}
+            <div id="niveau-{{ niveau }}" class="niveau-content" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                {% if kris %}
+                    <div class="grid grid-cols-2">
+                        {% for kri in kris %}
+                        <a href="{% url 'kri_detail' kri.pk %}" style="text-decoration: none;">
+                            <div class="indicator-card" style="border-left: 4px solid {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                <div class="indicator-header">
+                                    <div>
+                                        <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
+                                          {{ kri.name }}
+                                        </div>
+                                        <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kri.kind }} • {{ kri.get_nature_display }}</div>
+                                    </div>
+                                    <span class="status-badge" style="background: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                        {% if kri.risk_status == 'red' %}Critical{% elif kri.risk_status == 'yellow' %}Warning{% else %}Safe{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="indicator-value" style="margin: 1.5rem 0;">
+                                    <span class="value-number" style="font-size: 2.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-weight: bold;">{{ kri.latest_value|default:"—" }}</span>
+                                    {% if kri.nature %}
+                                    <span class="value-unit" style="margin-left: 0.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                        {% if kri.nature == 'PCT' %}%
+                                        {% elif kri.nature == 'DUR' %}days
+                                        {% else %}units{% endif %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+
+                                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 1rem;">
+                                    Objective: <span style="color: #e4e6eb;">{{ kri.objective|truncatewords:8 }}</span>
+                                </div>
+
+                                <div class="indicator-footer" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #2a3342;">
+                                    {% if kri.latest_date %}
+                                    <span style="font-size: 0.8rem; color: #888;">Updated: {{ kri.latest_date|date:"M d, H:i" }}</span>
+                                    {% else %}
+                                    <span style="font-size: 0.8rem; color: #888;">No measurements yet</span>
+                                    {% endif %}
+                                    <span style="color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-size: 0.9rem;">→</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 1rem; color: #b0b3b8;">
+                        <p style="font-size: 1rem; margin-bottom: 0.5rem;">No KRIs available for this level</p>
+                        <p style="font-size: 0.875rem;">Start by adding KRIs in the admin panel</p>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Regular User View: Single Niveau -->
+        <div style="margin-bottom: 1.5rem;">
+            <p style="color: #b0b3b8; margin-bottom: 1rem;">Viewing KRIs for: <strong style="color: #00d9ff;">{{ user_niveau }}</strong></p>
+        </div>
+
+        {% if kris %}
+            <div class="grid grid-cols-2">
+                {% for kri in kris %}
+                <a href="{% url 'kri_detail' kri.pk %}" style="text-decoration: none;">
+                    <div class="indicator-card" style="border-left: 4px solid {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                        <div class="indicator-header">
+                            <div>
+                                <div class="indicator-name" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    {{ kri.name }}
+                                </div>
+                                <div class="indicator-description" style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">{{ kri.kind }} • {{ kri.get_nature_display }}</div>
+                            </div>
+                            <span class="status-badge" style="background: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; color: white; padding: 0.5rem 0.75rem; border-radius: 4px;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor;"></span>
+                                {% if kri.risk_status == 'red' %}Critical{% elif kri.risk_status == 'yellow' %}Warning{% else %}Safe{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="indicator-value" style="margin: 1.5rem 0;">
+                            <span class="value-number" style="font-size: 2.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-weight: bold;">{{ kri.latest_value|default:"—" }}</span>
+                            {% if kri.nature %}
+                            <span class="value-unit" style="margin-left: 0.5rem; color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %};">
+                                {% if kri.nature == 'PCT' %}%
+                                {% elif kri.nature == 'DUR' %}days
+                                {% else %}units{% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 1rem;">
+                            Objective: <span style="color: #e4e6eb;">{{ kri.objective|truncatewords:8 }}</span>
+                        </div>
+
+                        <div class="indicator-footer" style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #2a3342;">
+                            {% if kri.latest_date %}
+                            <span style="font-size: 0.8rem; color: #888;">Updated: {{ kri.latest_date|date:"M d, H:i" }}</span>
+                            {% else %}
+                            <span style="font-size: 0.8rem; color: #888;">No measurements yet</span>
+                            {% endif %}
+                            <span style="color: {% if kri.risk_status == 'red' %}#ff4757{% elif kri.risk_status == 'yellow' %}#ffa502{% else %}#2ed573{% endif %}; font-size: 0.9rem;">→</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: #b0b3b8;">
+                <p style="font-size: 1rem; margin-bottom: 0.5rem;">No KRIs available for your level</p>
+                <p style="font-size: 0.875rem;">Contact your administrator for more information</p>
+            </div>
         {% endif %}
-      </div>
-      <span class="status-badge status-{{ kri.status }}">
-        <span
-          style="
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: currentColor;
-          "
-        ></span>
-        {{ kri.get_status_display }}
-      </span>
-    </div>
-
-    <!-- Main Metrics -->
-    <div class="grid grid-cols-3">
-      <div style="padding-right: 1.5rem">
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Current Value
-        </div>
-        <div style="font-size: 2.5rem; font-weight: bold; color: #00d9ff">
-          {{ kri.current_value }} {% if kri.unit %}<span
-            style="font-size: 1rem; color: #b0b3b8"
-            >{{ kri.unit }}</span
-          >{% endif %}
-        </div>
-      </div>
-
-      {% if kri.risk_threshold %}
-      <div
-        style="
-          padding-right: 1.5rem;
-          border-left: 1px solid #2a3342;
-          padding-left: 1.5rem;
-        "
-      >
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Risk Threshold
-        </div>
-        <div style="font-size: 2.5rem; font-weight: bold; color: #ff4757">
-          {{ kri.risk_threshold }} {% if kri.unit %}<span
-            style="font-size: 1rem; color: #b0b3b8"
-            >{{ kri.unit }}</span
-          >{% endif %}
-        </div>
-      </div>
-      {% endif %}
-<div class="progress">
-    <div class="progress-bar {% if kri.risk_percentage > 80 %}bg-danger
-                              {% elif kri.risk_percentage > 50 %}bg-warning
-                              {% else %}bg-success{% endif %}"
-         role="progressbar"
-         style="width: {{ kri.risk_percentage|floatformat:0 }}%"
-         aria-valuenow="{{ kri.risk_percentage|floatformat:0 }}"
-         aria-valuemin="0"
-         aria-valuemax="100">
-        {{ kri.risk_percentage|floatformat:0 }}%
-    </div>
+    {% endif %}
 </div>
 
-      <div style="border-left: 1px solid #2a3342; padding-left: 1.5rem">
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Trend
-        </div> 
-        <div style="font-size: 0.75rem; color: #b0b3b8; margin-top: 0.25rem">
-          {% if kri.trend_value >= 0 %} (Increasing Risk) {% else %} (Decreasing
-          Risk) {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
+<script>
+    function switchNiveau(element, niveau) {
+        // Hide all contents
+        document.querySelectorAll('.niveau-content').forEach(el => {
+            el.style.display = 'none';
+        });
 
-  <!-- Details Grid -->
-  <div class="grid grid-cols-2">
-    <!-- Left Column -->
-    <div>
-      <!-- Metadata -->
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Information</h3>
+        // Show selected content
+        document.getElementById('niveau-' + niveau).style.display = 'block';
 
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Niveau Level</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #00d9ff;
-              font-weight: 500;
-            "
-          >
-            {{ kri.get_niveau_display }}
-          </div>
-        </div>
+        // Update tab styling
+        document.querySelectorAll('.niveau-tab').forEach(tab => {
+            tab.style.borderBottomColor = 'transparent';
+            tab.style.color = '#b0b3b8';
+        });
+        element.style.borderBottomColor = '#00d9ff';
+        element.style.color = '#00d9ff';
+    }
 
-        {% if kri.solution %}
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Solution</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kri.solution.name }}
-          </div>
-        </div>
-        {% endif %}
+    // Initialize first tab
+    document.querySelector('.niveau-tab').click();
+</script>
 
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Last Updated</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kri.last_updated|date:"M d, Y H:i" }}
-          </div>
-        </div>
-
-        <div>
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Created</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kri.created_at|date:"M d, Y H:i" }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Column -->
-    <div>
-      <!-- Risk Assessment -->
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">
-          Risk Assessment
-        </h3>
-
-        {% if kri.risk_threshold and kri.current_value %}
-        <div style="margin-bottom: 1.5rem">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #b0b3b8">Risk Level</span>
-            <span
-              style="{% if kri.current_value >= kri.risk_threshold %}color: #ff4757;{% elif kri.current_value >= kri.risk_threshold|mul:0.7 %}color: #ffd000;{% else %}color: #3dd68c;{% endif %} font-weight: 500;"
-            >
-              {% widthratio kri.current_value kri.risk_threshold 100 %}%
-            </span>
-          </div>
-          <div
-            style="
-              width: 100%;
-              height: 8px;
-              background-color: #242c3c;
-              border-radius: 4px;
-              overflow: hidden;
-            "
-          >
-            <div
-              style="height: 100%; background: linear-gradient(90deg, #3dd68c, #ffd000, #ff4757); width: {% widthratio kri.current_value kri.risk_threshold 100 %}%; transition: width 0.3s ease;"
-            ></div>
-          </div>
-        </div>
-
-        <div
-          style="background-color: #242c3c; border-radius: 6px; padding: 1rem"
-        >
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #b0b3b8; font-size: 0.875rem">Current</span>
-            <span style="color: #e4e6eb; font-weight: 500"
-              >{{ kri.current_value }}</span
-            >
-          </div>
-          <div style="display: flex; justify-content: space-between">
-            <span style="color: #b0b3b8; font-size: 0.875rem">Threshold</span>
-            <span style="color: #ff4757; font-weight: 500"
-              >{{ kri.risk_threshold }}</span
-            >
-          </div>
-        </div>
-
-        {% if kri.current_value >= kri.risk_threshold %}
-        <div
-          style="
-            margin-top: 1rem;
-            background-color: rgba(255, 71, 87, 0.1);
-            border: 1px solid rgba(255, 71, 87, 0.2);
-            border-radius: 6px;
-            padding: 0.75rem;
-            color: #ff4757;
-            font-size: 0.875rem;
-          "
-        >
-          Risk threshold exceeded
-        </div>
-        {% endif %} {% endif %}
-      </div>
-
-      <!-- Mitigation Plan -->
-      {% if kri.mitigation_plan %}
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">
-          Mitigation Plan
-        </h3>
-        <div
-          style="
-            background-color: #242c3c;
-            border-left: 3px solid #9d4edd;
-            padding: 1rem;
-            border-radius: 6px;
-            color: #e4e6eb;
-            line-height: 1.6;
-          "
-        >
-          {{ kri.mitigation_plan }}
-        </div>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Status Summary -->
-  <div
-    style="
-      background-color: #1a1f2e;
-      border: 1px solid #2a3342;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-top: 2rem;
-    "
-  >
-    <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Status Summary</h3>
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-      <div style="flex: 1; min-width: 200px">
-        <div
-          style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem"
-        >
-          Current Status
-        </div>
-        <div>
-          <span
-            class="status-badge status-{{ kri.status }}"
-            style="font-size: 1rem"
-          >
-            <span
-              style="
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background-color: currentColor;
-              "
-            ></span>
-            {{ kri.get_status_display }}
-          </span>
-        </div>
-      </div>
-
-      <div style="flex: 1; min-width: 200px">
-        <div
-          style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem"
-        >
-          Trend Direction
-        </div>
-        <div
-          style="{% if kri.trend_value >= 0 %}color: #ff4757;{% else %}color: #3dd68c;{% endif %} font-weight: 500; font-size: 1rem;"
-        >
-          {% if kri.trend_value > 0 %} Risk Increasing ↑ ({{
-          kri.trend_value|floatformat:1 }}%) {% elif kri.trend_value < 0 %} Risk
-          Decreasing ↓ ({{ kri.trend_value|floatformat:1 }}%) {% else %} Risk
-          Stable → (No change) {% endif %}
-        </div>
-      </div>
-
-      <div style="flex: 1; min-width: 200px">
-        <div
-          style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem"
-        >
-          Risk Proximity
-        </div>
-        <div style="color: #e4e6eb; font-weight: 500; font-size: 1rem">
-           {% if kri.risk_threshold %} 
-           {% with distance=kri.risk_threshold|add:"-"|add:kri.current_value %} 
-           {% if distance <= 0 %}
-          <span style="color: #ff4757">Exceeded</span>
-          {% elif distance <= kri.risk_threshold|mul:0.2 %}
-          <span style="color: #ff4757"
-            >Critical ({{ distance|floatformat:0 }} away)</span
-          >
-          {% elif distance <= kri.risk_threshold|mul:0.5 %}
-          <span style="color: #ffd000"
-            >Warning ({{ distance|floatformat:0 }} away)</span
-          >
-          {% else %}
-          <span style="color: #3dd68c"
-            >Safe ({{ distance|floatformat:0 }} away)</span
-          >
-          {% endif %} {% endwith %} {% else %} No threshold set {% endif %}
-
-          {% if kri.risk_threshold %} {% with distance=kri.risk_threshold|add:"-"|add:kri.current_value %} 
-          {% if distance <= 0 %}
-          <span style="color: #ff4757">Exceeded</span>
-          {% elif distance <= kri.risk_threshold|mul:0.2 %}
-          <span style="color: #ff4757"
-            >Critical ({{ distance|floatformat:0 }} away)</span
-          >
-          {% elif distance <= kri.risk_threshold|mul:0.5 %}
-          <span style="color: #ffd000"
-            >Warning ({{ distance|floatformat:0 }} away)</span
-          >
-          {% else %}
-          <span style="color: #3dd68c"
-            >Safe ({{ distance|floatformat:0 }} away)</span
-          >
-          {% endif %} {% endwith %} {% else %} No threshold set {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<style>
+    .niveau-tab:hover {
+        color: #00d9ff;
+    }
+</style>
 {% endblock %}

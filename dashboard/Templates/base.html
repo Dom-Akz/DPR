@@ -519,28 +519,21 @@ ONEE
   </svg>
   Générer un rapport
 </a>
-
- <div class="nav-section-title">Account Management</div>
-            <a
-              href="{% url 'admin_management' %}"
-              class="nav-item {% if request.resolver_match.url_name == 'admin_management' %}active{% endif %}"
-            >
-              <svg
-                class="nav-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Administrator Management
-            </a>
-
-          </div>
+{% if user.is_superuser %}
+<div class="nav-section-title">Account Management</div>
+<a
+    href="{% url 'admin_management' %}"
+    class="nav-item {% if request.resolver_match.url_name == 'admin_management' %}active{% endif %}"
+>
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+    Administrator Management
+</a>
+{% endif %}
         
-        {% endif %}
+{% endif %}
 </nav>
         <div class="sidebar-footer">
           <div class="user-menu">

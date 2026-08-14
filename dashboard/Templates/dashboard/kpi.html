@@ -3,19 +3,6 @@
 {% block title %}KPIs - Dashboard{% endblock %}
 {% block page_title %}Key Performance Indicators (KPIs){% endblock %}
 
-{% block header_actions %}
-<div style="display: flex; gap: 1rem;">
-    {% if is_superuser %}
-    <select id="niveau-filter" style="padding: 0.625rem 1rem; background-color: #242c3c; border: 1px solid #2a3342; border-radius: 6px; color: #e4e6eb; cursor: pointer;">
-        <option value="all">All Levels</option>
-        <option value="N0">Technical (N0)</option>
-        <option value="N1">Operational (N1)</option>
-        <option value="N2">Management (N2)</option>
-        <option value="N3">Executive (N3)</option>
-    </select>
-    {% endif %}
-</div>
-{% endblock %}
 
 {% block content %}
 <div>
