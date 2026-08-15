@@ -1,410 +1,269 @@
-{% extends 'base.html' %} {% block title %}{{ kpi.name }} - KPI Detail{%
-endblock %} {% block page_title %}{{ kpi.name }}{% endblock %} {% block
-header_actions %}
+{% extends 'base.html' %}
+
+{% block title %}{{ kpi.name }} - KPI Detail{% endblock %}
+{% block page_title %} KPI Detail {% endblock %}
+
+{% block header_actions %}
 <a href="{% url 'kpi_list' %}" class="btn btn-secondary">
-  <svg
-    style="width: 18px; height: 18px"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-  >
-    <line x1="19" y1="12" x2="5" y2="12"></line>
-    <polyline points="12 19 5 12 12 5"></polyline>
-  </svg>
-  Back to KPIs
+    ← Back to KPIs
 </a>
-{% endblock %} {% block content %}
-<div style="max-width: 1000px">
-  <!-- Header Card -->
-  <div
-    style="
-      background-color: #1a1f2e;
-      border: 1px solid #2a3342;
-      border-radius: 12px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-    "
-  >
-    <div
-      style="
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 1.5rem;
-      "
-    >
-      <div>
-        <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem">
-          {{ kpi.name }}
-        </h2>
-        {% if kpi.description %}
-        <p style="color: #b0b3b8; font-size: 0.95rem">{{ kpi.description }}</p>
-        {% endif %}
-      </div>
-      <span class="status-badge status-{{ kpi.status }}">
-        <span
-          style="
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: currentColor;
-          "
-        ></span>
-        {{ kpi.get_status_display }}
-      </span>
-    </div>
-
-    <!-- Main Metrics -->
-    <div class="grid grid-cols-3">
-      <div style="padding-right: 1.5rem">
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Current Value
-        </div>
-        <div style="font-size: 2.5rem; font-weight: bold; color: #00d9ff">
-          {{ kpi.current_value }} {% if kpi.unit %}<span
-            style="font-size: 1rem; color: #b0b3b8"
-            >{{ kpi.unit }}</span
-          >{% endif %}
-        </div>
-      </div>
-
-      {% if kpi.target_value %}
-      <div
-        style="
-          padding-right: 1.5rem;
-          border-left: 1px solid #2a3342;
-          padding-left: 1.5rem;
-        "
-      >
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Target Value
-        </div>
-        <div style="font-size: 2.5rem; font-weight: bold; color: #9d4edd">
-          {{ kpi.target_value }} {% if kpi.unit %}<span
-            style="font-size: 1rem; color: #b0b3b8"
-            >{{ kpi.unit }}</span
-          >{% endif %}
-        </div>
-      </div>
-      {% endif %}
-
-      <div style="border-left: 1px solid #2a3342; padding-left: 1.5rem">
-        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem">
-          Trend
-        </div>
-        <div
-          style="font-size: 2rem; font-weight: bold; {% if kpi.trend_value >= 0 %}color: #3dd68c;{% else %}color: #ff4757;{% endif %}"
-        >
-          {% if kpi.trend_value >= 0 %}↑{% else %}↓{% endif %} {{
-          kpi.trend_value|floatformat:1 }}%
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Details Grid -->
-  <div class="grid grid-cols-2">
-    <!-- Left Column -->
-    <div>
-      <!-- Metadata -->
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Information</h3>
-
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Niveau Level</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #00d9ff;
-              font-weight: 500;
-            "
-          >
-            {{ kpi.get_niveau_display }}
-          </div>
-        </div>
-
-        {% if kpi.solution %}
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Solution</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kpi.solution.name }}
-          </div>
-        </div>
-        {% endif %}
-
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Frequency</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kpi.get_frequency_display }}
-          </div>
-        </div>
-
-        <div style="margin-bottom: 1.5rem">
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Last Updated</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kpi.last_updated|date:"M d, Y H:i" }}
-          </div>
-        </div>
-
-        <div>
-          <label
-            style="
-              display: block;
-              color: #b0b3b8;
-              font-size: 0.875rem;
-              margin-bottom: 0.5rem;
-              font-weight: 500;
-            "
-            >Created</label
-          >
-          <div
-            style="
-              padding: 0.75rem 1rem;
-              background-color: #242c3c;
-              border-radius: 6px;
-              color: #e4e6eb;
-            "
-          >
-            {{ kpi.created_at|date:"M d, Y H:i" }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Column -->
-    <div>
-      <!-- Formula/Calculation -->
-      {% if kpi.formula %}
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Formula</h3>
-        <div
-          style="
-            background-color: #242c3c;
-            border-left: 3px solid #00d9ff;
-            padding: 1rem;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.875rem;
-            color: #e4e6eb;
-            line-height: 1.6;
-          "
-        >
-          {{ kpi.formula }}
-        </div>
-      </div>
-      {% endif %}
-
-      <!-- Performance -->
-      <div
-        style="
-          background-color: #1a1f2e;
-          border: 1px solid #2a3342;
-          border-radius: 12px;
-          padding: 1.5rem;
-        "
-      >
-        <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Performance</h3>
-
-        {% if kpi.target_value and kpi.current_value %}
-        <div style="margin-bottom: 1.5rem">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #b0b3b8">Achievement</span>
-            <span style="color: #00d9ff; font-weight: 500">
-              {% widthratio kpi.current_value kpi.target_value 100 %}%
-            </span>
-          </div>
-          <div
-            style="
-              width: 100%;
-              height: 8px;
-              background-color: #242c3c;
-              border-radius: 4px;
-              overflow: hidden;
-            "
-          >
-            <div
-              style="height: 100%; background: linear-gradient(90deg, #00d9ff, #9d4edd); width: {% widthratio kpi.current_value kpi.target_value 100 %}%; transition: width 0.3s ease;"
-            ></div>
-          </div>
-        </div>
-        {% endif %}
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem">
-          <div>
-            <div
-              style="
-                color: #b0b3b8;
-                font-size: 0.875rem;
-                margin-bottom: 0.25rem;
-              "
-            >
-              Current vs Target
-            </div>
-            <div style="color: #e4e6eb; font-weight: 500">
-              {{ kpi.current_value }} {% if kpi.target_value %} / {{
-              kpi.target_value }}{% endif %}
-            </div>
-          </div>
-          <div>
-            <div
-              style="
-                color: #b0b3b8;
-                font-size: 0.875rem;
-                margin-bottom: 0.25rem;
-              "
-            >
-              Variance
-            </div>
-            {% if kpi.target_value %}
-    <span style="color: {{ kpi.status_color }}; font-weight: 500;">
-        {% if kpi.difference_from_target >= 0 %}+{% endif %}
-        {{ kpi.difference_from_target|floatformat:2 }}
-        <small>({{ kpi.difference_percentage|floatformat:1 }}%)</small>
-    </span>
-{% else %}
-    <span class="text-muted">N/A</span>
-{% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Status Timeline Info -->
-  <div
-    style="
-      background-color: #1a1f2e;
-      border: 1px solid #2a3342;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-top: 2rem;
-    "
-  >
-    <h3 style="font-size: 1.125rem; margin-bottom: 1rem">Status Summary</h3>
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-      <div style="flex: 1; min-width: 200px">
-        <div
-          style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem"
-        >
-          Current Status
-        </div>
-        <div>
-          <span
-            class="status-badge status-{{ kpi.status }}"
-            style="font-size: 1rem"
-          >
-            <span
-              style="
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background-color: currentColor;
-              "
-            ></span>
-            {{ kpi.get_status_display }}
-          </span>
-        </div>
-      </div>
-
-      <div style="flex: 1; min-width: 200px">
-        <div
-          style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem"
-        >
-          Trend Direction
-        </div>
-        <div
-          style="{% if kpi.trend_value >= 0 %}color: #3dd68c;{% else %}color: #ff4757;{% endif %} font-weight: 500; font-size: 1rem;"
-        >
-          {% if kpi.trend_value > 0 %} Increasing ↑ ({{
-          kpi.trend_value|floatformat:1 }}%) {% elif kpi.trend_value < 0 %}
-          Decreasing ↓ ({{ kpi.trend_value|floatformat:1 }}%) {% else %} Stable
-          → (No change) {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
+{% block content %}
+<div style="max-width: 1000px">
+    <!-- Header Card -->
+    <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+            <div>
+                <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">{{ kpi.name }}</h2>
+                {% if kpi.description %}
+                <p style="color: #b0b3b8; font-size: 0.95rem;">{{ kpi.description }}</p>
+                {% endif %}
+            </div>
+            <span class="status-badge status-{{ kpi.status }}">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; display: inline-block;"></span>
+                {{ kpi.get_status_display }}
+            </span>
+        </div>
+
+        <!-- Main Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div>
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">Current Value</div>
+                <div style="font-size: 2.5rem; font-weight: bold; color: #00d9ff;">
+                    {{ kpi.current_value|default:"—" }}
+                    {% if kpi.unit %}<span style="font-size: 1rem; color: #b0b3b8;">{{ kpi.unit }}</span>{% endif %}
+                </div>
+            </div>
+
+            {% if kpi.target_value %}
+            <div style="border-left: 1px solid #2a3342; padding-left: 1.5rem;">
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">Target Value</div>
+                <div style="font-size: 2.5rem; font-weight: bold; color: #9d4edd;">
+                    {{ kpi.target_value|floatformat:2 }}
+                    {% if kpi.unit %}<span style="font-size: 1rem; color: #b0b3b8;">{{ kpi.unit }}</span>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="{% if kpi.target_value %}border-left: 1px solid #2a3342; padding-left: 1.5rem;{% endif %}">
+                <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">Trend</div>
+                <div style="font-size: 2rem; font-weight: bold; {% if kpi.trend_value >= 0 %}color: #3dd68c;{% else %}color: #ff4757;{% endif %}">
+                    {% if kpi.trend_value >= 0 %}↑{% else %}↓{% endif %}
+                    {{ kpi.trend_value|floatformat:1|default:"0" }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Left Column -->
+        <div>
+            <!-- Metadata -->
+            <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Information</h3>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Niveau Level</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #00d9ff; font-weight: 500;">
+                        {{ kpi.get_level_display }}  {# ✅ Changed from get_niveau_display #}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Type</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #e4e6eb;">
+                        {{ kpi.get_kind_display }}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Nature</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #e4e6eb;">
+                        {{ kpi.get_nature_display }}
+                    </div>
+                </div>
+
+                {% if kpi.solution %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Solution</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #e4e6eb;">
+                        {{ kpi.solution.name }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Last Updated</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #e4e6eb;">
+                        {{ kpi.latest_date|date:"M d, Y H:i"|default:"No data yet" }}
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.5rem; font-weight: 500;">Created</label>
+                    <div style="padding: 0.75rem 1rem; background-color: #242c3c; border-radius: 6px; color: #e4e6eb;">
+                        {{ kpi.created_at|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <!-- Formula/Calculation -->
+            {% if kpi.formula %}
+            <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Formula</h3>
+                <div style="background-color: #242c3c; border-left: 3px solid #00d9ff; padding: 1rem; border-radius: 6px; font-family: monospace; font-size: 0.875rem; color: #e4e6eb; line-height: 1.6;">
+                    {{ kpi.formula }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Performance -->
+            <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem;">
+                <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Performance</h3>
+
+                {% if kpi.target_value and kpi.current_value is not None %}
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #b0b3b8;">Achievement</span>
+                        <span style="color: #00d9ff; font-weight: 500;">
+                            {% widthratio kpi.current_value kpi.target_value 100 %}%
+                        </span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background-color: #242c3c; border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; background: linear-gradient(90deg, #00d9ff, #9d4edd); width: {% widthratio kpi.current_value kpi.target_value 100 %}%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.25rem;">Current vs Target</div>
+                        <div style="color: #e4e6eb; font-weight: 500;">
+                            {{ kpi.current_value|default:"—" }}
+                            {% if kpi.target_value %} / {{ kpi.target_value|floatformat:2 }}{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color: #b0b3b8; font-size: 0.875rem; margin-bottom: 0.25rem;">Variance</div>
+                        {% if kpi.target_value and kpi.current_value is not None %}
+                            <span style="color: {{ kpi.performance_color }}; font-weight: 500;">
+                                {% if kpi.target_diff >= 0 %}+{% endif %}
+                                {{ kpi.target_diff|floatformat:2 }}
+                                <small>({{ kpi.target_diff_percentage|floatformat:1 }}%)</small>
+                            </span>
+                        {% else %}
+                            <span style="color: #b0b3b8;">N/A</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if kpi.target_value and kpi.current_value is not None %}
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #2a3342;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #b0b3b8; font-size: 0.875rem;">Status</span>
+                        <span style="color: {{ kpi.performance_color }}; font-weight: 500;">
+                            {{ kpi.performance_label }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Summary -->
+    <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Status Summary</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem;">Current Status</div>
+                <div>
+                    <span class="status-badge status-{{ kpi.status }}" style="font-size: 1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background-color: currentColor; display: inline-block;"></span>
+                        {{ kpi.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem;">Trend Direction</div>
+                <div style="{% if kpi.trend_value >= 0 %}color: #3dd68c;{% else %}color: #ff4757;{% endif %} font-weight: 500; font-size: 1rem;">
+                    {% if kpi.trend_value > 0 %}
+                        Increasing ↑ ({{ kpi.trend_value|floatformat:1 }}%)
+                    {% elif kpi.trend_value < 0 %}
+                        Decreasing ↓ ({{ kpi.trend_value|floatformat:1 }}%)
+                    {% else %}
+                        Stable → (No change)
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem;">Latest Measurement</div>
+                <div style="color: #e4e6eb; font-weight: 500;">
+                    {{ kpi.latest_value|default:"No data" }}
+                    {% if kpi.latest_date %}
+                        <small style="color: #b0b3b8; font-weight: 400; font-size: 0.8rem;">
+                            ({{ kpi.latest_date|date:"M d, Y" }})
+                        </small>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+                <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem;">Total Measurements</div>
+                <div style="color: #e4e6eb; font-weight: 500;">
+                    {{ kpi.measurements.count }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Measurements Table -->
+    {% if kpi.measurements.exists %}
+    <div style="background-color: #1a1f2e; border: 1px solid #2a3342; border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+        <h3 style="font-size: 1.125rem; margin-bottom: 1rem;">Recent Measurements</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #2a3342;">
+                        <th style="padding: 0.75rem; text-align: left; color: #b0b3b8;">Date</th>
+                        <th style="padding: 0.75rem; text-align: right; color: #b0b3b8;">Value</th>
+                        <th style="padding: 0.75rem; text-align: right; color: #b0b3b8;">Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for measurement in measurements %}
+                    <tr style="border-bottom: 1px solid #2a3342;">
+                        <td style="padding: 0.75rem; color: #e4e6eb;">{{ measurement.calculated_at|date:"M d, Y H:i" }}</td>
+                        <td style="padding: 0.75rem; text-align: right; color: #00d9ff; font-weight: 500;">
+                            {{ measurement.value|floatformat:2 }}
+                            {% if kpi.unit %}<span style="color: #b0b3b8; font-weight: 400;">{{ kpi.unit }}</span>{% endif %}
+                        </td>
+                        <td style="padding: 0.75rem; text-align: right;">
+                            {% if forloop.counter0 < measurements|length|add:"-1" %}
+                                {% with next_measurement=measurements|slice:forloop.counter|first %}
+                                    {% with change=measurement.value|add:next_measurement.value|add:"-" %}
+                                        <span style="color: {% if change >= 0 %}#3dd68c{% else %}#ff4757{% endif %};">
+                                            {% if change >= 0 %}+{% endif %}{{ change|floatformat:2 }}
+                                        </span>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% else %}
+                                <span style="color: #b0b3b8;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

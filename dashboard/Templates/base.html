@@ -481,24 +481,6 @@ ONEE
           </div>
 
           {% if user.is_authenticated %}
-          <div class="nav-section">
-            <div class="nav-section-title">Account</div>
-            <a
-              href="{% url 'profile' %}"
-              class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
-            >
-              <svg
-                class="nav-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Profile
-            </a>
 <div class="nav-section-title">Reports</div>
 <a
   href="{% url 'report_builder' %}"
@@ -519,6 +501,23 @@ ONEE
   </svg>
   Générer un rapport
 </a>
+ <div class="nav-section-title">Account</div>
+            <a
+              href="{% url 'profile' %}"
+              class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+            >
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
+            </a>
 {% if user.is_superuser %}
 <div class="nav-section-title">Account Management</div>
 <a
@@ -547,12 +546,6 @@ ONEE
               <div class="user-role">{{ user.get_niveau_display }}</div>
             </div>
           </div>
-<a href="{% url 'logout' %}"
-   class="btn btn-danger"
-   title="Logout"
-   aria-label="Logout">
-    <i class="bi bi-box-arrow-right"></i>
-</a>
 
         </div>
       </aside>

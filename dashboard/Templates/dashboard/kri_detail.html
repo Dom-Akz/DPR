@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ kri.name }} - KRI Detail{% endblock %}
 
-{% block page_title %}{{ kri.name }}{% endblock %}
+{% block page_title %} KRI - Detail {% endblock %}
 
 {% block header_actions %}
 <a href="{% url 'kri_list' %}" class="btn btn-secondary">
@@ -152,15 +151,15 @@
 
                 {% if kri.current_value >= kri.risk_threshold %}
                 <div style="margin-top: 1rem; background-color: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.2); border-radius: 6px; padding: 0.75rem; color: #ff4757; font-size: 0.875rem;">
-                    ⚠️ Risk threshold exceeded! Current value ({{ kri.current_value|floatformat:2 }}) is above threshold ({{ kri.risk_threshold|floatformat:2 }}).
+                    Risk threshold exceeded! Current value ({{ kri.current_value|floatformat:2 }}) is above threshold ({{ kri.risk_threshold|floatformat:2 }}).
                 </div>
                 {% elif kri.risk_percentage >= 70 %}
                 <div style="margin-top: 1rem; background-color: rgba(255, 208, 0, 0.1); border: 1px solid rgba(255, 208, 0, 0.2); border-radius: 6px; padding: 0.75rem; color: #ffd000; font-size: 0.875rem;">
-                    ⚠️ Approaching risk threshold. Current value is at {{ kri.risk_percentage|floatformat:0 }}% of threshold.
+                    Approaching risk threshold. Current value is at {{ kri.risk_percentage|floatformat:0 }}% of threshold.
                 </div>
                 {% else %}
                 <div style="margin-top: 1rem; background-color: rgba(61, 214, 140, 0.1); border: 1px solid rgba(61, 214, 140, 0.2); border-radius: 6px; padding: 0.75rem; color: #3dd68c; font-size: 0.875rem;">
-                    ✅ Risk level is within acceptable range.
+                    Risk level is within acceptable range.
                 </div>
                 {% endif %}
 
@@ -201,11 +200,11 @@
                 <div style="font-size: 0.875rem; color: #b0b3b8; margin-bottom: 0.75rem;">Trend Direction</div>
                 <div style="color: {% if kri.trend_value >= 0 %}#ff4757{% else %}#3dd68c{% endif %}; font-weight: 500; font-size: 1rem;">
                     {% if kri.trend_value > 0 %}
-                        🔺 Risk Increasing ↑ ({{ kri.trend_value|floatformat:1 }}%)
+                        Risk Increasing ↑ ({{ kri.trend_value|floatformat:1 }}%)
                     {% elif kri.trend_value < 0 %}
-                        🔽 Risk Decreasing ↓ ({{ kri.trend_value|floatformat:1 }}%)
+                        Risk Decreasing ↓ ({{ kri.trend_value|floatformat:1 }}%)
                     {% else %}
-                        ➡️ Risk Stable → (No change)
+                        Risk Stable → (No change)
                     {% endif %}
                 </div>
             </div>
@@ -215,11 +214,11 @@
                 <div style="color: #e4e6eb; font-weight: 500; font-size: 1rem;">
                     {% if kri.risk_threshold and kri.current_value is not None %}
                         {% if kri.current_value >= kri.risk_threshold %}
-                            <span style="color: #ff4757;">⚠️ Exceeded</span>
+                            <span style="color: #ff4757;">Exceeded</span>
                         {% elif kri.risk_percentage >= 70 %}
-                            <span style="color: #ffd000;">⚠️ Approaching threshold</span>
+                            <span style="color: #ffd000;">Approaching threshold</span>
                         {% else %}
-                            <span style="color: #3dd68c;">✅ Safe</span>
+                            <span style="color: #3dd68c;">Safe</span>
                         {% endif %}
                     {% else %}
                         <span style="color: #b0b3b8;">No threshold set</span>

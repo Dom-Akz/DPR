@@ -9,6 +9,10 @@ from .models import Administrateur, Indicator, IndicatorMeasurement, Solution
 from django.contrib import messages
 from django_smart_ratelimit import ratelimit
 from .reporting import build_payload, export_report
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from .forms import ProfileUpdateForm
+from django.db import models
 
 
 # Authentification :
@@ -190,13 +194,13 @@ def kpi_detail(request, pk):
         )
 
         context = {
-            "indicator": indicator,
+            "kpi": indicator,
             "latest_measurement": latest_measurement,
             "measurements": indicator.measurements.all()[:10],
         }
         return render(request, "dashboard/kpi_detail.html", context)
     except Indicator.DoesNotExist:
-        return redirect("/admin/dashboard/kpi_list")
+        return redirect("kpi_list")
 
 
 def superuser_required(view):
@@ -296,13 +300,13 @@ def kri_detail(request, pk):
         )
 
         context = {
-            "indicator": indicator,
+            "kri": indicator,
             "latest_measurement": latest_measurement,
             "measurements": indicator.measurements.all()[:10],
         }
         return render(request, "dashboard/kri_detail.html", context)
     except Indicator.DoesNotExist:
-        return redirect("/admin/dashboard/kri_list")
+        return redirect("kri_list")
 
 
 @login_required(login_url="login")
@@ -323,10 +327,52 @@ def kpi_list_by_solution(request):
 
 @login_required(login_url="login")
 def user_profile(request):
-    """User profile view"""
-    context = {
-        "user": request.user,
+
+    if request.method == "POST":
+        # Check if password change is requested
+        if "change_password" in request.POST:
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Keep user logged in
+                messages.success(request, "Mot de passe modifié avec succès!")
+                return redirect("profile")
+            else:
+                messages.error(request, "Erreur lors du changement de mot de passe.")
+        else:
+            # Profile update
+            form = ProfileUpdateForm(request.POST, instance=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profil mis à jour avec succès!")
+                return redirect("profile")
+            else:
+                messages.error(request, "Erreur lors de la mise à jour du profil.")
+
+    # GET request - display forms
+    form = ProfileUpdateForm(instance=request.user)
+    password_form = PasswordChangeForm(request.user)
+
+    # Get user statistics
+    user_stats = {
+        "indicators_accessed": Indicator.objects.filter(
+            models.Q(level=request.user.role) | models.Q(level__isnull=True)
+        ).count()
+        if request.user.role
+        else 0,
+        "last_login": request.user.last_login,
+        "date_joined": request.user.date_joined,
+        "is_superuser": request.user.is_superuser or request.user.is_supperuser,
     }
+
+    context = {
+        "form": form,
+        "password_form": password_form,
+        "user": request.user,
+        "stats": user_stats,
+        "profile_update_active": True,
+    }
+
     return render(request, "dashboard/profile.html", context)
 
 

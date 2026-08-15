@@ -24,9 +24,42 @@ class Administrateur(AbstractUser):
     is_supperuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    phone_number = models.CharField(
+        "Numéro de téléphone",
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Numéro de téléphone professionnel",
+    )
+    job_title = models.CharField(
+        "Fonction/Poste",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Intitulé du poste",
+    )
+    last_login_ip = models.GenericIPAddressField(
+        "Dernière adresse IP",
+        blank=True,
+        null=True,
+        help_text="Dernière adresse IP de connexion",
+    )
+    last_login_location = models.CharField(
+        "Dernière localisation",
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Dernière localisation approximative",
+    )
 
     def __str__(self):
-        return self.first_name
+        return (
+            f"{self.first_name} {self.last_name}" if self.first_name else self.username
+        )
+
+    class Meta:
+        verbose_name = "Administrateur"
+        verbose_name_plural = "Administrateurs"
 
 
 class Solution(models.Model):
