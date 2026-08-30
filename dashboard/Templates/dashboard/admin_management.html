@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block title %}ONEE · Gestion des administrateurs{% endblock %} {% block content %}
+{% extends 'base.html' %} {% block page_title %} Administrator Management {% endblock %}{% block title %}ONEE · Gestion des administrateurs{% endblock %} {% block content %}
 <style>
   .admin-grid {
     display: grid;
@@ -133,14 +133,8 @@
   <div>
     <div class="eyebrow">Administration · accès superuser</div>
     <h1>Gestion des administrateurs</h1>
-    <p class="lead">
-      Créez, modifiez et contrôlez les accès des administrateurs de la
-      plateforme.
-    </p>
   </div>
-  <div class="stat">
-    <strong>{{ admins|length }}</strong><span>Administrateurs</span>
-  </div>
+  
 </div>
 <div class="admin-grid">
   <section class="admin-card">

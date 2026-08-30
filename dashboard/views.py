@@ -13,6 +13,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from .forms import ProfileUpdateForm
 from django.db import models
+from django_otp import login as otp_login, match_token, user_has_device
 
 
 # Authentification :
@@ -28,18 +29,41 @@ def login_u(request):
         return redirect("/admin/dashboard/")
 
     if request.method == "POST":
+        if "otp_token" in request.POST:
+            user_id = request.session.get("pre_2fa_user_id")
+            user = (
+                Administrateur.objects.filter(pk=user_id).first() if user_id else None
+            )
+            device = (
+                match_token(user, request.POST.get("otp_token", "")) if user else None
+            )
+
+            if device is not None:
+                login(request, user)
+                otp_login(request, device)
+                del request.session["pre_2fa_user_id"]
+                messages.success(request, "You have been logged in successfully.")
+                return redirect("/admin/dashboard/")
+
+            messages.error(request, "Code de vérification invalide.")
+            return render(request, "login.html", {"step": "otp"})
+
+        # Etape 1 : identifiants
         username = request.POST.get("username")
         password = request.POST.get("password")
-
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user is None:
+            messages.error(request, "Invalid username or password")
+            return render(request, "login.html")
+
+        if not user_has_device(user):
             login(request, user)
             messages.success(request, "You have been logged in successfully.")
             return redirect("/admin/dashboard/")
-        else:
-            messages.error(request, "Invalid username or password")
-            return render(request, "login.html")
+
+        request.session["pre_2fa_user_id"] = user.pk
+        return render(request, "login.html", {"step": "otp"})
 
     return render(request, "login.html")
 
@@ -391,7 +415,6 @@ def api_update_indicator(request, pk, indicator_type):
         else:
             return JsonResponse({"error": "Invalid indicator type"}, status=400)
 
-        # Update logic would go here
         return JsonResponse({"success": True, "id": indicator.pk})
     except (KPI.DoesNotExist, KRI.DoesNotExist):
         return JsonResponse({"error": "Indicator not found"}, status=404)
@@ -492,8 +515,6 @@ def indicator_list(request, kind):
         if level and level != "all":
             qs = qs.filter(level=level)
     else:
-        # Non-superusers are always scoped to their assigned level. The
-        # query-string value is intentionally ignored to prevent escalation.
         qs = qs.filter(level=request.user.role)
         level = request.user.role
     if can_filter_solution and solution_id and solution_id != "all":

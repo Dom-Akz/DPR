@@ -1,5 +1,5 @@
 # Dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
     libpango-1.0-0 \
     libpango1.0-dev \
     libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 \
-    libgdk-pixbuf2.0-dev \
+    libgdk-pixbuf-2.0-0 \
+    libgdk-pixbuf-2.0-dev \
     libffi-dev \
     libjpeg-dev \
     libpng-dev \
