@@ -34,7 +34,7 @@ Le **KPI/KRI Dashboard** est une application web Django développée pour l'**Of
 
 ## 🔄 Flux de Données
 
-![Architecture du flux de données](images/architecture_flux.png)
+![Architecture du flux de données](images/arch.png)
 
 ## ✨ Fonctionnalités
 
