@@ -14,18 +14,21 @@ class FileServerError(RuntimeError):
 
 
 class NormalizedLogsClient:
-    def __init__(self, base_url: str, api_key: str, verify_tls: bool = True):
+    def __init__(self, base_url: str, api_key: str, verify_tls: bool | str = True):
         self.base_url = base_url.rstrip("/")
         self._headers = {"X-API-Key": api_key}
         self._verify_tls = verify_tls
 
     def list_files(self, source: str) -> list[dict]:
+        url = f"{self.base_url}/files/{source}"
+        logger.info("  requete : GET %s", url)
         resp = requests.get(
-            f"{self.base_url}/files/{source}",
+            url,
             headers=self._headers,
             timeout=_TIMEOUT,
             verify=self._verify_tls,
         )
+        logger.info("  reponse : %s %s", resp.status_code, url)
         if resp.status_code == 401:
             raise FileServerError("Clé API rejetée par le serveur de fichiers.")
         resp.raise_for_status()
@@ -38,12 +41,15 @@ class NormalizedLogsClient:
             return None
 
         filename = files[0]["name"]  # déjà trié du plus récent au plus ancien
+        url = f"{self.base_url}/files/{source}/{filename}"
+        logger.info("  requete : GET %s", url)
         resp = requests.get(
-            f"{self.base_url}/files/{source}/{filename}",
+            url,
             headers=self._headers,
             timeout=_TIMEOUT,
             verify=self._verify_tls,
         )
+        logger.info("  reponse : %s %s", resp.status_code, url)
         if resp.status_code == 401:
             raise FileServerError("Clé API rejetée par le serveur de fichiers.")
         resp.raise_for_status()

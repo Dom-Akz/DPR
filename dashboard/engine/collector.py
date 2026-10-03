@@ -30,11 +30,6 @@ def _save_measurement(indicator_name: str, solution_name: str, value) -> bool:
     mesure. Retourne True si enregistrée, False si ignorée (indicateur
     introuvable ou valeur non numérique)."""
     if value is None:
-        logger.info(
-            "Valeur non calculable pour '%s' (%s) — ignorée.",
-            indicator_name,
-            solution_name,
-        )
         return False
 
     if not isinstance(value, (int, float)):

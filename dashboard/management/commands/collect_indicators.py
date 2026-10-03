@@ -19,9 +19,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         base_url = os.environ.get("VM_FILE_SERVER_BASE_URL")
         api_key = os.environ.get("VM_FILE_SERVER_API_KEY")
-        verify_tls = (
-            os.environ.get("VM_FILE_SERVER_VERIFY_TLS", "true").lower() == "true"
-        )
+        verify_tls_raw = os.environ.get("VM_FILE_SERVER_VERIFY_TLS", "true")
+
+        if verify_tls_raw.lower() in ("true", "false"):
+            verify_tls = verify_tls_raw.lower() == "true"
+        else:
+            verify_tls = verify_tls_raw
 
         if not base_url or not api_key:
             raise CommandError(

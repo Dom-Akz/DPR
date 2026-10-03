@@ -24,7 +24,7 @@ load_dotenv(dotenv_path)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
+FILESERVER_VERIFY_TLS = os.environ.get("VM_FILE_SERVER_VERIFY_TLS", default=True)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -80,7 +80,26 @@ TEMPLATES = [
         },
     },
 ]
-
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "dashboard.engine.collector": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
 WSGI_APPLICATION = "DPR.wsgi.application"
 
 DATABASES = {
