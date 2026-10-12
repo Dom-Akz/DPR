@@ -105,7 +105,6 @@ Le **KPI/KRI Dashboard** est une application web Django développée pour l'**Of
 - **OS** : Linux (Ubuntu 22.04+), macOS, ou Windows avec WSL2
 - **Python** : 3.10+
 - **PostgreSQL** : 14+
-- **Redis** : 6+ (optionnel)
 - **Nginx** : 1.18+ (production)
 
 ---
